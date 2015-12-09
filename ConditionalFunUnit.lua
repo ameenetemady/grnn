@@ -2,7 +2,6 @@ require 'nn'
 
 local MyMul10, parent = torch.class('nn.MyMul10', 'nn.Module')
 
-
 function MyMul10:__init()
   parent.__init(self)
 
@@ -10,28 +9,33 @@ end
 
 
 function MyMul10:updateOutput(input)
-  return 10*input
+  self.output = torch.mul(input, 0.5)
+  return self.output
 end
+
+--local HillEq, parent = torch.class('nn.HillEq', 'nn.Module')
+
+
 
 
 function ConditionalFunUnit_branchConst()
-  local branchPassThroughA = nn.Sequential()
-  branchPassThroughA:add(nn.Identity())
-  branchPassThroughA:add(nn.Identity())
-  branchPassThroughA:add(nn.Padding(1, 1)) -- added just to increase dimention
+  local branchA = nn.Sequential()
+  branchA:add(nn.Identity())
+  branchA:add(nn.Identity())
+  branchA:add(nn.Padding(1, 1)) -- added just to increase dimention
 
-  local branchPassThroughB = nn.Sequential()
-  branchPassThroughB:add(nn.MulConstant(-1))
-  branchPassThroughB:add(nn.AddConstant(1))
-  branchPassThroughB:add(nn.Padding(1, 1)) -- added just to increase dimention
+  local branchB = nn.Sequential()
+  branchB:add(nn.MulConstant(-1))
+  branchB:add(nn.AddConstant(1))
+  branchB:add(nn.Padding(1, 1)) -- added just to increase dimention
 
-  local branchPassThroughConcatAB = nn.Parallel(2, 1)
+  local branchConcatAB = nn.Parallel(2, 1)
 
-  branchPassThroughConcatAB:add(branchPassThroughA)
-  branchPassThroughConcatAB:add(branchPassThroughB)
+  branchConcatAB:add(branchA)
+  branchConcatAB:add(branchB)
 
   local seqMul = nn.Sequential()
-  seqMul:add(branchPassThroughConcatAB)
+  seqMul:add(branchConcatAB)
   seqMul:add(nn.View(2, 1))
   seqMul:add(nn.SplitTable(1))
   seqMul:add(nn.MM(true, false))
@@ -40,11 +44,46 @@ function ConditionalFunUnit_branchConst()
 end
 
 
-function ConditionalFunUnit_branchTrainable()
+function ConditionalFunUnit_branchTrainable(fuLearnableModuleFactory)
+  local branchA = nn.Sequential()
+  branchA:add(fuLearnableModuleFactory())
+  branchA:add(nn.Padding(1, 1)) -- added just to increase dimention
+
+  local branchB = nn.Sequential()
+  branchB:add(nn.Identity())
+  branchB:add(nn.Padding(1, 1)) -- added just to increase dimention
+
+  local branchConcatAB = nn.Parallel(2, 1)
+
+  branchConcatAB:add(branchA)
+  branchConcatAB:add(branchB)
+
+  local seqMul = nn.Sequential()
+  seqMul:add(branchConcatAB)
+  seqMul:add(nn.View(2, 1))
+  seqMul:add(nn.SplitTable(1))
+  seqMul:add(nn.MM(true, false))
+  seqMul:add(nn.Identity())
+
+  return seqMul
+
 
 end
 
 function ConditionalFunUnit(fuLearnableModuleFactory)
-  return ConditionalFunUnit_branchConst()
+  local branchConst = ConditionalFunUnit_branchConst()
+  local branchTrainable = ConditionalFunUnit_branchTrainable(fuLearnableModuleFactory)
+
+
+  local concatMain = nn.Concat(1)
+  concatMain:add(branchConst)
+  concatMain:add(branchTrainable)
+
+  local main = nn.Sequential()
+  main:add(concatMain)
+  main:add(nn.Sum(1))
+
+
+ return main 
 
 end
