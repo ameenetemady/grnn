@@ -4,8 +4,8 @@ local Hill, parent = torch.class('nn.Hill', 'nn.Module')
 
 function Hill:__init(weight_initial) -- later consider the multiple output case
   parent.__init(self)
-  self.weight = torch.Tensor(4) -- {b, a, k, n}
-  self.gradWeight = torch.Tensor(4)
+  self.weight = torch.Tensor(4):zero() -- {b, a, k, n}
+  self.gradWeight = torch.Tensor(4):zero()
   self.weight_initial = weight_initial
 
   self:reset()
@@ -29,7 +29,11 @@ function Hill:updateOutput(input)
 end
 
 function Hill:updateGradInput(input, gradOutput)
-  self.gradInput = hill_getGrad_x(input, self.weight)
+  self.gradInput:resizeAs(input):zero()
+
+  local gradx = hill_getGrad_x(input, self.weight)
+
+  self.gradInput:cmul(gradx, gradOutput) 
 
   return self.gradInput
 end
@@ -37,7 +41,10 @@ end
 function Hill:accGradParameters(input, gradOutput, scale)
   local scale = scale or 1
 
-  self.gradWeight[1] = self.gradWeight[1] + scale * hill_getGrad_b():dot(gradOutput)
+  print(input)
+--  print(self.weight)
+--  print(gradOutput)
+  self.gradWeight[1] = self.gradWeight[1] + scale * hill_getGrad_b(input, self.weight):dot(gradOutput)
 
   self.gradWeight[2] = self.gradWeight[2] + scale * hill_getGrad_a(input, self.weight):dot(gradOutput)
 
@@ -49,6 +56,41 @@ end
 
 function hill_extract_params(weight)
   return weight[1], weight[2], weight[3], weight[4]
+end
+
+function hill_getGrad_b(input, weight)
+  local gradb = input:clone():fill(1)
+  return gradb
+end
+
+function hill_getGrad_a(input, weight)
+  local grada = input:clone()
+
+  local b, a, k, n = hill_extract_params(weight)
+  assert(k ~= 0, "weight[3] (k), cannot be zero")
+
+  grada:apply(
+    function(x)
+      local denominator = 1 + math.pow(x/k, n)
+      assert( denominator ~= 0, "(x/k) cannot be -1")
+      local y = 1/denominator
+      return y
+    end)
+
+  return grada
+
+end
+
+function hill_getGrad_k(input, weight)
+  local gradk = input:clone():fill(0) -- returning zero for now
+
+  return gradk
+end
+
+function hill_getGrad_n(input, weight)
+  local gradn = input:clone():fill(0) -- returning zero for now
+
+  return gradn
 end
 
 function hill_getOutput(input, weight)
@@ -64,6 +106,22 @@ function hill_getOutput(input, weight)
       return y
     end)
 
-    return output
+  return output
+end
+
+function hill_getGrad_x(input, weight)
+  local gradx = input:clone()
+
+  local b, a, k, n = hill_extract_params(weight)
+  assert(k ~= 0, "weight[3] (k), cannot be zero")
+
+  gradx:apply(
+    function(x)
+      local y = -a * math.pow(k, n) * math.pow(math.pow(k, n) + math.pow(x, n), -2) * n * math.pow(x, n-1)
+      return y
+    end)
+
+  return gradx
 
 end
+
