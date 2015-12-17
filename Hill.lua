@@ -23,7 +23,12 @@ function Hill:reset()
 
 end
 
+function Hill:ensureConstraint()
+  self.weight:abs()
+end
+
 function Hill:updateOutput(input)
+  --self:ensureConstraint()
   self.output = hill_getOutput(input, self.weight)
   return self.output
 end
@@ -41,7 +46,7 @@ end
 function Hill:accGradParameters(input, gradOutput, scale)
   local scale = scale or 1
 
-  print(input)
+--  print(input)
 --  print(self.weight)
 --  print(gradOutput)
   self.gradWeight[1] = self.gradWeight[1] + scale * hill_getGrad_b(input, self.weight):dot(gradOutput)
@@ -67,7 +72,6 @@ function hill_getGrad_a(input, weight)
   local grada = input:clone()
 
   local b, a, k, n = hill_extract_params(weight)
-  assert(k ~= 0, "weight[3] (k), cannot be zero")
 
   grada:apply(
     function(x)
@@ -82,13 +86,43 @@ function hill_getGrad_a(input, weight)
 end
 
 function hill_getGrad_k(input, weight)
-  local gradk = input:clone():fill(0) -- returning zero for now
+  local gradk = input:clone()
+
+  local b, a, k, n = hill_extract_params(weight)
+
+  gradk:apply(
+    function(x)
+      local denominator = math.pow(k, n) + math.pow(x, n)
+      assert( denominator ~= 0, "k^n + x^n cannot be zero")
+      local y = a * n * math.pow(k, n-1) * (1/denominator - math.pow(k, n)/math.pow(denominator, 2))
+      return y
+    end)
 
   return gradk
 end
 
 function hill_getGrad_n(input, weight)
-  local gradn = input:clone():fill(0) -- returning zero for now
+  local gradn = input:clone()
+  -- returning zero for now, until find a way for "constrained" optimization and conforming with the domain
+  gradn:zero()
+
+  --[[
+  local b, a, k, n = hill_extract_params(weight)
+
+  assert( k > 0, "k should be greater than zero")
+
+  gradn:apply(
+    function(x)
+      assert( x > 0, "x should be greater than zero")
+
+      local denominator = math.pow(k, n) + math.pow(x, n)
+      assert( denominator ~= 0, "k^n + x^n cannot be zero" .. ", k:" .. k .. ", x:" .. x .. ", n:" .. n .. ", denominator:" .. denominator )
+      local y = a * math.pow(k, n) * math.log(k) / denominator - (math.pow(k, n) * math.log(k) + math.pow(x, n) * math.log(x))/ math.pow(denominator, 2)
+      return y
+    end)
+
+    --]]
+
 
   return gradn
 end
