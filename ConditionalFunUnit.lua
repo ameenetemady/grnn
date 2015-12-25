@@ -106,7 +106,8 @@ function OneLayer_ConditionalFunUnit(fuLearnableModuleFactory, nGenes, geneID)
   caItself:add(caUnit)
 
   if geneID == nGenes then
-    caItself:add(nn.View(-1, 1 )) -- ensure two dimentional
+    caItself:add(nn.Replicate(1, 2)) -- replicate (ensure two dimentional), "nn.View" returns "non-contigues" error, using nn.Replicate to workaround it
+--    caItself:add(nn.View(-1, 1 )) -- ensure two dimentional
   else
     caItself:add(nn.Replicate(2, 2)) -- replicate
   end
@@ -129,9 +130,7 @@ function MultiLayer_ConditionalFunUnit(fuLearnableModuleFactory, nGenes)
   local mainSeq = nn.Sequential()
 
   for i=1, nGenes do
-    print("i: " .. i)
     local currLayer = OneLayer_ConditionalFunUnit(fuLearnableModuleFactory, nGenes, i)
-
     mainSeq:add(currLayer)
 
   end

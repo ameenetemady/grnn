@@ -102,14 +102,6 @@ function ConditionalFunUnit_test.train_test1()
 end
 
 
-function  ConditionalFunUnit_test.Cascade_forward_test1_getWeights_synth()
-  local weight = torch.Tensor({{1.5, 2.5, 4, 2},
-                              {1.5, 2.5, 4, 2},
-                              {1.5, 2.5, 4, 2},
-                              {1.5, 2.5, 4, 2}})
-  return weight
-end
-
 function  ConditionalFunUnit_test.OneLayerCascade_forward_test1()
   local nSize = 7
   local nGenes = 4
@@ -129,7 +121,6 @@ function  ConditionalFunUnit_test.OneLayerCascade_forward_test1()
   print(target)
 
 end
-
 
 function  ConditionalFunUnit_test.MultiLayerCascade_forward_test1()
   local nSize = 7
@@ -151,6 +142,57 @@ function  ConditionalFunUnit_test.MultiLayerCascade_forward_test1()
 
 end
 
+function  ConditionalFunUnit_test.MultiLayerCascade_train_test1()
+  local nSize = 70
+  local nGenes = 4
+
+  -- 1) Generate input
+  local teX = ConditionalFunUnit_test.getRandInput(nSize, nGenes)
+  print("input: ")
+  print(teX)
+
+  -- 2) Generate target
+  local synthWeights = ConditionalFunUnit_test.Cascade_getWeights_synth()
+  local fuFun1 = function(geneID)
+    local weight = synthWeights[geneID] 
+    return  nn.Hill(weight)
+  end
+
+  local mlp_multiLayer1 = MultiLayer_ConditionalFunUnit(fuFun1, nGenes)
+  local target = mlp_multiLayer1:forward(teX)
+
+  -- 3) Generate Model
+  local initModelWeights = ConditionalFunUnit_test.Cascade_getWeights_initModel()
+  local fuFun2 = function(geneID)
+    local weight = initModelWeights[geneID] 
+    return  nn.Hill(weight)
+  end
+
+  local mlp_multiLayer2 = MultiLayer_ConditionalFunUnit(fuFun2, nGenes)
+
+  local taData = ConditionalFunUnit_test.getTable(teX, target)
+
+  -- 3) train Model
+  ConditionalFunUnit_test.logParams(mlp_multiLayer2)
+  trainerPool.full_CG(taData, mlp_multiLayer2)
+  ConditionalFunUnit_test.logParams(mlp_multiLayer2)
+end
+
+function  ConditionalFunUnit_test.Cascade_getWeights_synth()
+  local weight = torch.Tensor({{1.0, 2.5, 1, 2},
+                              {1.5, 2.0, 4, 2},
+                              {1.0, 2.5, 1, 2},
+                              {1.5, 2.0, 4, 2}})
+  return weight
+end
+
+function  ConditionalFunUnit_test.Cascade_getWeights_initModel()
+  local weight = torch.Tensor({{1.0, 2.5, 4, 2},
+                              {1.0, 2.5, 4, 2},
+                              {1.0, 2.5, 4, 2},
+                              {1.0, 2.5, 4, 2}})
+  return weight
+end
 
 
 function ConditionalFunUnit_test.getTable(teX, teY)
@@ -159,8 +201,11 @@ function ConditionalFunUnit_test.getTable(teX, teY)
   myUtil.pri_addSize(taData)
 
   for i=1, nSize do
-    local taRow = { teX[i], torch.Tensor(1):fill(teY[i]) }
-    table.insert(taData, taRow)
+    if teY:dim() == 1 then
+      table.insert(taData, { teX[i], torch.Tensor(1):fill(teY[i]) })
+    else
+      table.insert(taData, { teX[i], teY[i]})
+    end
   end
 
   return taData
@@ -192,7 +237,8 @@ function  ConditionalFunUnit_test.all()
 --  ConditionalFunUnit_test.backward_test1()
 --  ConditionalFunUnit_test.train_test1()
 --  ConditionalFunUnit_test.OneLayerCascade_forward_test1()
-  ConditionalFunUnit_test.MultiLayerCascade_forward_test1()
+--  ConditionalFunUnit_test.MultiLayerCascade_forward_test1()
+  ConditionalFunUnit_test.MultiLayerCascade_train_test1()
 
 end
 
