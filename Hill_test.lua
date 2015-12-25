@@ -128,29 +128,49 @@ function Hill_test.accGradParameters_test4()
   torch.manualSeed(1)
   local criterion = nn.MSECriterion()
   local synthWeight1 = torch.Tensor({1, 2, 3, 2})
-  local synthWeight2 = torch.Tensor({1, 2, 3, 2})
-  local nSize = 1000
+  local synthWeight2 = torch.Tensor({5, 4, 6, 2})
+  local nSize = 100
 
   local taData, synthModel = Hill_test.genHillData3(synthWeight1, synthWeight2, nSize)
 
+
+  local weight1 = torch.Tensor({1.5, 2.2, 3, 2})
+  local weight2 = torch.Tensor({0.1, 2.5, 3, 2})
+  local hill1 = nn.Hill(weight1)
+  local hill2 = nn.Hill(weight2)
+
+  local model = Hill_test.getSeqConModule(hill1, hill2)
+
+
+  Hill_test.logParams(model)
+  trainerPool.full_CG(taData, model)
+  Hill_test.logParams(model)
+
+  print("expected parameters")
+  local synthParams, _ = synthModel:getParameters()
+  print(synthParams)
+
 end
 
+function Hill_test.getSeqConModule(m1, m2)
+  local seq = nn.Sequential()
+  seq:add(m1)
+
+  local con = nn.Concat(2)
+  con:add(nn.Identity())
+  con:add(m2)
+
+  seq:add(con)
+
+  return seq
+end
 
 function Hill_test.genHillData3(weight1, weight2, nSize)
   local teX = torch.rand(nSize,1)*100
   local hill1 = nn.Hill(weight1)
   local hill2 = nn.Hill(weight2)
 
-  local seq = nn.Sequential()
-  seq:add(hill1)
-
-  local con = nn.Concat(2)
-  con:add(nn.Identity())
-  con:add(hill2)
-
-  seq:add(con)
-
-
+  local seq = Hill_test.getSeqConModule(hill1, hill2)
   local teY= seq:forward(teX)
 
   print(teY)

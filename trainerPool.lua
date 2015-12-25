@@ -63,7 +63,8 @@ end
     parameters, gradParameters = model:getParameters()
 
     local overallErr = 0
-    local nCols = taData[1][1]:size(1)
+    local nXCols = taData[1][1]:size(1)
+    local nYCols = taData[1][2]:size(1)
 
     for t = 1,taData:size(), taTrainParams.batchSize do
  
@@ -71,8 +72,8 @@ end
       local currBatchSize = math.min(taTrainParams.batchSize, taData:size() - t + 1)
 --      io.write( t .. ", " )
 --      io.flush()
-      local teBatchX = torch.zeros(currBatchSize, nCols)
-      local teBatchY = torch.zeros(currBatchSize)
+      local teBatchX = torch.zeros(currBatchSize, nXCols)
+      local teBatchY = torch.zeros(currBatchSize, nYCols)
       local k = 1
       for i = t, math.min(t + taTrainParams.batchSize - 1, taData:size()) do
         teBatchX[k] = taData[i][1]
