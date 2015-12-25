@@ -42,9 +42,9 @@ function ConditionalFunUnit_branchConst()
 end
 
 
-function ConditionalFunUnit_branchTrainable(fuLearnableModuleFactory)
+function ConditionalFunUnit_branchTrainable(fuLearnableModuleFactory, param)
   local branchA = nn.Sequential()
-  branchA:add(fuLearnableModuleFactory())
+  branchA:add(fuLearnableModuleFactory(param))
 --  branchA:add(nn.Padding(1, 1)) -- added just to increase dimention
 
   local branchB = nn.Sequential()
@@ -68,9 +68,9 @@ function ConditionalFunUnit_branchTrainable(fuLearnableModuleFactory)
 
 end
 
-function ConditionalFunUnit(fuLearnableModuleFactory)
+function ConditionalFunUnit(fuLearnableModuleFactory, param)
   local branchConst = ConditionalFunUnit_branchConst()
-  local branchTrainable = ConditionalFunUnit_branchTrainable(fuLearnableModuleFactory)
+  local branchTrainable = ConditionalFunUnit_branchTrainable(fuLearnableModuleFactory, param)
 
 
   local concatMain = nn.Concat(2)
@@ -84,4 +84,57 @@ function ConditionalFunUnit(fuLearnableModuleFactory)
 
  return main 
 
+end
+
+
+function OneLayer_ConditionalFunUnit(fuLearnableModuleFactory, nGenes, geneID)
+  local mainP = nn.Concat(2)
+
+  -- before Ca
+  if geneID ~= 1 then
+    local beforeCa = nn.Sequential()
+    beforeCa:add( nn.Narrow(2, 1, geneID - 1))
+    beforeCa:add( nn.Identity())
+    
+    mainP:add(beforeCa)
+  end
+
+  -- for Ca
+  local caItself = nn.Sequential()
+  caItself:add(nn.Narrow(2, geneID, 2))
+  local caUnit = ConditionalFunUnit(fuLearnableModuleFactory, geneID)
+  caItself:add(caUnit)
+
+  if geneID == nGenes then
+    caItself:add(nn.View(-1, 1 )) -- ensure two dimentional
+  else
+    caItself:add(nn.Replicate(2, 2)) -- replicate
+  end
+  mainP:add(caItself)
+
+
+  -- after Ca
+  if geneID ~= nGenes then
+    local afterCa = nn.Sequential()
+    afterCa:add(nn.Narrow(2, geneID + 2, nGenes - geneID))
+    afterCa:add(nn.Identity())
+    mainP:add(afterCa)
+  end
+
+  return mainP
+
+end
+
+function MultiLayer_ConditionalFunUnit(fuLearnableModuleFactory, nGenes)
+  local mainSeq = nn.Sequential()
+
+  for i=1, nGenes do
+    print("i: " .. i)
+    local currLayer = OneLayer_ConditionalFunUnit(fuLearnableModuleFactory, nGenes, i)
+
+    mainSeq:add(currLayer)
+
+  end
+
+  return mainSeq
 end
