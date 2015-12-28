@@ -29,13 +29,15 @@ function test1()
   trainerPool.full_CG(taData, mlp)
   grnnUtil.logParams(mlp)
 
+  print(mlp:forward(teInput))
+
 end
 
 function  Cascade_getWeights_initModel()
-  local weight = torch.Tensor({{1.0, 2.5, 4, 1.17},
-                              {1.0, 2.5, 4, 1.17},
-                              {1.0, 2.5, 4, 1.17},
-                              {1.0, 2.5, 4, 1.17}})
+  local weight = torch.Tensor({{1.0, 2.5, 4, 2},
+                              {1.0, 2.5, 4, 2},
+                              {1.0, 2.5, 4, 2},
+                              {1.0, 2.5, 4, 2}})
   return weight
 end
 
