@@ -2,8 +2,9 @@ require 'nn'
 require('./ConditionalFunUnit.lua')
 require('./Hill.lua')
 
-local myUtil = require('../ANN/common/util.lua')
-local trainerPool = require('./trainerPool.lua')
+local myUtil = require('../MyCommon/util.lua')
+local trainerPool = require('../MyCommon/trainerPool.lua')
+local grnnUtil = require('./grnnUtil.lua')
 
 local ConditionalFunUnit_test = {}
 
@@ -147,7 +148,7 @@ function  ConditionalFunUnit_test.MultiLayerCascade_train_test1()
   local nGenes = 4
 
   -- 1) Generate input
-  local teX = ConditionalFunUnit_test.getRandInput(nSize, nGenes)
+  local teX = grnnUtil.getRandInput(nSize, nGenes)
   print("input: ")
   print(teX)
 
@@ -170,12 +171,12 @@ function  ConditionalFunUnit_test.MultiLayerCascade_train_test1()
 
   local mlp_multiLayer2 = MultiLayer_ConditionalFunUnit(fuFun2, nGenes)
 
-  local taData = ConditionalFunUnit_test.getTable(teX, target)
+  local taData = grnnUtil.getTable(teX, target)
 
   -- 3) train Model
-  ConditionalFunUnit_test.logParams(mlp_multiLayer2)
+  grnnUtil.logParams(mlp_multiLayer2)
   trainerPool.full_CG(taData, mlp_multiLayer2)
-  ConditionalFunUnit_test.logParams(mlp_multiLayer2)
+  grnnUtil.logParams(mlp_multiLayer2)
 end
 
 function  ConditionalFunUnit_test.Cascade_getWeights_synth()
@@ -194,42 +195,6 @@ function  ConditionalFunUnit_test.Cascade_getWeights_initModel()
   return weight
 end
 
-
-function ConditionalFunUnit_test.getTable(teX, teY)
-  local nSize = teX:size(1)
-  local taData = { n = nSize}
-  myUtil.pri_addSize(taData)
-
-  for i=1, nSize do
-    if teY:dim() == 1 then
-      table.insert(taData, { teX[i], torch.Tensor(1):fill(teY[i]) })
-    else
-      table.insert(taData, { teX[i], teY[i]})
-    end
-  end
-
-  return taData
-end
-
-function ConditionalFunUnit_test.logParams(model)
-
-  local parameters, gradParams = model:getParameters()
-  print("parameters:")
-  print(parameters)
-end
-
-function ConditionalFunUnit_test.getRandInput(nSize, nGenes)
-  local nWidth = (nGenes or 1) + 1
-
-  local teX = torch.rand(nSize, nWidth)
-  teX:select(2, 1):mul(10)
-
-  for i=2, nWidth do
-    teX:select(2, i):round()
-  end
-
-  return teX
-end
 
 function  ConditionalFunUnit_test.all()
   torch.manualSeed(2)

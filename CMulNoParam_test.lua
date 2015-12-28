@@ -1,7 +1,7 @@
 require 'nn'
 require('./CMulNoParam.lua')
 
-local myUtil = require('../ANN/common/util.lua')
+local myUtil = require('../MyCommon/util.lua')
 
 local CMulNoParam_test = {}
 

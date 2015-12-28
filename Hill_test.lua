@@ -2,8 +2,8 @@ require 'nn'
 require('./Hill.lua')
 require 'gnuplot'
 
-local myUtil = require('../ANN/common/util.lua')
-local trainerPool = require('./trainerPool.lua')
+local myUtil = require('../MyCommon/util.lua')
+local trainerPool = require('../MyCommon/trainerPool.lua')
 
 local Hill_test = {}
 
