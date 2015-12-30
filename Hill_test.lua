@@ -15,6 +15,16 @@ function Hill_test.hill_getOutput_test1()
   print(output)
 end
 
+function Hill_test.hill_getOutput_test2()
+  local input = torch.linspace(-10, 10, 100)
+  local weight = torch.Tensor({2.12, -1.85, 2.71, 2})
+  local output = hill_getOutput(input, weight)
+
+  gnuplot.plot('synthetic', input, output, 'points pt 2 ps 0.4')
+--  print(output)
+end
+
+
 function Hill_test.forward_test1()
   local weight = torch.Tensor({1, 2, 3, 2})
   local hill = nn.Hill(weight)
@@ -241,6 +251,7 @@ end
 function  Hill_test.all()
 --    Hill_test.E2EA()
 --  Hill_test.hill_getOutput_test1()
+--  Hill_test.hill_getOutput_test2()
 --  Hill_test.forward_test1()
 --  Hill_test.updateGradInput_test1()
 --  Hill_test.accGradParameters_test1()

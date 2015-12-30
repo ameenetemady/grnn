@@ -1,3 +1,5 @@
+require 'nn'
+
 local grnnUtil = {}
 local myUtil = require('../MyCommon/util.lua')
 
@@ -36,6 +38,19 @@ do
     end
 
     return teX
+  end
+
+  function grnnUtil.getSeqConModule(m1, m2)
+    local seq = nn.Sequential()
+    seq:add(m1)
+
+    local con = nn.Concat(2)
+    con:add(nn.Identity())
+    con:add(m2)
+
+    seq:add(con)
+
+    return seq
   end
 
   return grnnUtil

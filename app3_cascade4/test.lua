@@ -1,6 +1,7 @@
 require 'nn'
 require('../ConditionalFunUnit.lua')
 require('../Hill.lua')
+require('../GLogistic.lua')
 
 local myUtil = require('../../MyCommon/util.lua')
 local trainerPool = require('../../MyCommon/trainerPool.lua')
@@ -17,7 +18,7 @@ function test1()
   local initModelWeights = Cascade_getWeights_initModel()
   local fuFun = function(geneID)
     local weight = initModelWeights[geneID] 
-    return  nn.Hill(weight)
+    return  nn.GLogistic(weight)
   end
 
   local mlp = MultiLayer_ConditionalFunUnit(fuFun, nGenes)

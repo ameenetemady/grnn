@@ -23,12 +23,7 @@ function Hill:reset()
 
 end
 
-function Hill:ensureConstraint()
-  self.weight:abs()
-end
-
 function Hill:updateOutput(input)
-  --self:ensureConstraint()
   self.output = hill_getOutput(input, self.weight)
   return self.output
 end
@@ -46,9 +41,6 @@ end
 function Hill:accGradParameters(input, gradOutput, scale)
   local scale = scale or 1
 
---  print(input)
---  print(self.weight)
---  print(gradOutput)
   self.gradWeight[1] = self.gradWeight[1] + scale * hill_getGrad_b(input, self.weight):dot(gradOutput)
 
   self.gradWeight[2] = self.gradWeight[2] + scale * hill_getGrad_a(input, self.weight):dot(gradOutput)
