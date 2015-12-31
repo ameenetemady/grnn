@@ -68,21 +68,22 @@ function ConditionalFunUnit_branchTrainable(fuLearnableModuleFactory, param)
 
 end
 
-function ConditionalFunUnit(fuLearnableModuleFactory, param)
-  local branchConst = ConditionalFunUnit_branchConst()
+function ConditionalFunUnit(fuLearnableModuleFactory, param) -- seems only the trainable branch is needed! so changing:
+--  local branchConst = ConditionalFunUnit_branchConst()
   local branchTrainable = ConditionalFunUnit_branchTrainable(fuLearnableModuleFactory, param)
 
 
-  local concatMain = nn.Concat(2)
-  concatMain:add(branchConst)
-  concatMain:add(branchTrainable)
+--  local concatMain = nn.Concat(2)
+--  concatMain:add(branchConst)
+--  concatMain:add(branchTrainable)
 
-  local main = nn.Sequential()
-  main:add(concatMain)
-  main:add(nn.Sum(2))
+--  local main = nn.Sequential()
+--  main:add(concatMain)
+--  main:add(nn.Sum(2))
 
 
- return main 
+-- return main 
+  return branchTrainable
 
 end
 

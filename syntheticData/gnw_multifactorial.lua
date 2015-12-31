@@ -4,7 +4,7 @@ local myUtil = require('../../MyCommon/util.lua')
 local gnw_multifactorial = {}
 
 function gnw_multifactorial.cascade5()
-  local permutGen = PermutationGenerator({0, 0, 0, 0, 0}, {5, 1, 1, 1, 1})
+  local permutGen = PermutationGenerator({0, 0, 0, 0, 0}, {100, 1, 1, 1, 1})
   local tePerm = permutGen:getNext()
   local taAll = {}
 
@@ -15,7 +15,7 @@ function gnw_multifactorial.cascade5()
 
 
   local teAll = myUtil.getTensorFromTableOfTensors(taAll)
-  teAll:narrow(2, 1, 1):mul(0.2)
+  teAll:narrow(2, 1, 1):mul(0.01)
   local strRes = myUtil.getCsvStringFrom2dTensor(teAll)
 
   print(strRes)
