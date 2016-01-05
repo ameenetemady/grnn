@@ -27,6 +27,12 @@ do
     print(parameters)
   end
 
+  function grnnUtil.getSubModel(model, geneID)
+    local id = (geneID == 1) and 1 or 2
+    local s1 = model.modules[geneID].modules[id].modules[2].modules[1].modules[1].modules[1]
+    return s1
+  end
+
   function grnnUtil.getRandInput(nSize, nGenes)
     local nWidth = (nGenes or 1) + 1
 

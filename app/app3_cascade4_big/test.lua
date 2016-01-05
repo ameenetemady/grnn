@@ -1,13 +1,13 @@
 require 'nn'
 require 'gnuplot'
-require('../ConditionalFunUnit.lua')
-require('../Hill.lua')
-require('../GLogistic.lua')
+require('../../ConditionalFunUnit.lua')
+require('../../Hill.lua')
+require('../../GLogistic.lua')
 
-local myUtil = require('../../MyCommon/util.lua')
-local trainerPool = require('../../MyCommon/trainerPool.lua')
+local myUtil = require('../../../MyCommon/util.lua')
+local trainerPool = require('../../../MyCommon/trainerPool.lua')
 local dataLoad = require('./dataLoad.lua')
-local grnnUtil = require('../grnnUtil.lua')
+local grnnUtil = require('../../grnnUtil.lua')
 
 function plot1()
   local teInput = dataLoad.loadInput()

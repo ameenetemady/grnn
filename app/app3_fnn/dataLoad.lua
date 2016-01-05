@@ -1,6 +1,6 @@
-local settings = require('../settings.lua')
+local settings = require('../../settings.lua')
 local csv = require("csv")
-local myUtil = require('../../MyCommon/util.lua')
+local myUtil = require('../../../MyCommon/util.lua')
 
 local dataLoad = {}
 

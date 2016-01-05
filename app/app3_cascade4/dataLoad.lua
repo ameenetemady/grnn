@@ -1,6 +1,6 @@
-local settings = require('../settings.lua')
+local settings = require('../../settings.lua')
 local csv = require("csv")
-local myUtil = require('../../MyCommon/util.lua')
+local myUtil = require('../../../MyCommon/util.lua')
 
 local dataLoad = {}
 
@@ -25,15 +25,15 @@ do
   end
 
   function  dataLoad.loadInput()
-    local nInputCols = settings.cascade4_big.nInputCols
-    local teInput = dataLoad.loadFromTsv(settings.cascade4_big.inputFilename, nInputCols)
+    local nInputCols = settings.cascade4.nInputCols
+    local teInput = dataLoad.loadFromTsv(settings.cascade4.inputFilename, nInputCols)
     teInput:narrow(2, 2, nInputCols -1):add(1) -- so that "-1" becomes "0" and "0" becomes "1"
     return teInput
   end
 
   function dataLoad.loadTarget()
-    local nTargetCols = settings.cascade4_big.nTargetCols
-    local teTarget = dataLoad.loadFromTsv(settings.cascade4_big.targetFilename, nTargetCols)
+    local nTargetCols = settings.cascade4.nTargetCols
+    local teTarget = dataLoad.loadFromTsv(settings.cascade4.targetFilename, nTargetCols)
     return teTarget
 
   end
