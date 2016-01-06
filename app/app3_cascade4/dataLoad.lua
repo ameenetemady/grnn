@@ -38,8 +38,45 @@ do
 
   end
 
---  print(dataLoad.loadInput())
---  print(dataLoad.loadTarget())
+  function dataLoad.isMatch(a, b, noise)
+
+    local bPlusNoise = b + noise
+    local bMinusNoise = b - noise
+    local isALess = torch.lt(a, bPlusNoise)
+    local isAMore = torch.gt(a, bMinusNoise)
+    return torch.all(isALess) and torch.all(isAMore)
+  end
+
+  function dataLoad.loadTrainTest()
+    local teInput = dataLoad.loadInput()
+    local teTarget = dataLoad.loadTarget()
+    local taInputTest = {}
+    local taInputTrain = {}
+    local taTargetTrain = {}
+    local taTargetTest = {}
+    local noise = 0.1
+
+    local teInutSetting = teInput:sub(1, -1, 2, -1)
+    local nGenes = teInutSetting:size(2)
+
+    for i=1, teInput:size(1) do
+      if teInutSetting[i]:sum() == nGenes or 
+         dataLoad.isMatch(teInput[i], torch.Tensor({0, 0, 1, 0, 1 }), noise) or
+         dataLoad.isMatch(teInput[i], torch.Tensor({0, 0, 0, 1, 0 }), noise) then
+
+        table.insert(taInputTrain, teInput[i])
+        table.insert(taTargetTrain, teTarget[i])
+      else
+        table.insert(taInputTest, teInput[i])
+        table.insert(taTargetTest, teTarget[i])
+      end
+    end
+
+    local taTrain = { myUtil.getTensorFromTableOfTensors(taInputTrain), myUtil.getTensorFromTableOfTensors(taTargetTrain) }
+    local taTest = { myUtil.getTensorFromTableOfTensors(taInputTest), myUtil.getTensorFromTableOfTensors(taTargetTest) }
+
+    return taTrain, taTest
+  end
 
   return dataLoad
 end

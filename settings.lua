@@ -4,6 +4,10 @@ do
   settings.cascade4 = {}
   settings.cascade4.inputFilename = "/home/ameen/gnw/app3_cascade5/processed/input.tsv"
   settings.cascade4.targetFilename= "/home/ameen/gnw/app3_cascade5/processed/target.tsv"
+  settings.cascade4.train_inputFilename= "/home/ameen/gnw/app3_cascade5/processed/train_input.tsv"
+  settings.cascade4.train_targetFilename= "/home/ameen/gnw/app3_cascade5/processed/train_target.tsv"
+  settings.cascade4.test_inputFilename= "/home/ameen/gnw/app3_cascade5/processed/test_input.tsv"
+  settings.cascade4.test_targetFilename= "/home/ameen/gnw/app3_cascade5/processed/test_target.tsv"
   settings.cascade4.nInputCols = 5
   settings.cascade4.nTargetCols = 4
 

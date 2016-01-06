@@ -9,6 +9,7 @@ local trainerPool = require('../../../MyCommon/trainerPool.lua')
 local dataLoad = require('./dataLoad.lua')
 local grnnUtil = require('../../grnnUtil.lua')
 local strModelFileTest1 = "test1.model"
+local strModelFileTest2 = "test2.model"
 
 function plot1()
   local teInput = dataLoad.loadInput()
@@ -51,8 +52,8 @@ function getCascadeInputTarget(geneID)
   return teX, teY
 end
 
-function plotModelOverData(geneID)
-  local mlp = torch.load(strModelFileTest1)
+function plotModelOverData(geneID, strModelFilename)
+  local mlp = torch.load(strModelFilename)
   local glogistic = grnnUtil.getSubModel(mlp, geneID)
 
   local teX, teY = getCascadeInputTarget(geneID)
@@ -61,6 +62,7 @@ function plotModelOverData(geneID)
   local teModelY = glogistic:forward(teModelX)
   gnuplot.plot({'Model', teModelX, teModelY, 'lines ls 1 lc rgb "red"'},
                {'data', teX, teY, 'points pt 2 ps 0.4 lc rgb "blue"'} )
+  gnuplot.title("G-" .. geneID)
 
 end
 
@@ -101,12 +103,36 @@ function  Cascade_getWeights_initModel()
   return weight
 end
 
+function test2()
+  local nGenes = 4
+  -- Load data
+  local taTrain, taTest = dataLoad.loadTrainTest()
+  local taData = grnnUtil.getTable(taTrain[1], taTrain[2])
+  
+  -- 2) Generate Model
+  local initModelWeights = Cascade_getWeights_initModel()
+  local fuFun = function(geneID)
+    local weight = initModelWeights[geneID] 
+    return  nn.GLogistic(weight)
+  end
+
+  local mlp = MultiLayer_ConditionalFunUnit(fuFun, nGenes)
+
+
+  -- 3) train Model / load Model
+  trainerPool.full_CG(taData, mlp)
+  torch.save(strModelFileTest2 , mlp)
+--  mlp = torch.load(strModelFileTest2)
+
+  -- 4) test Model
+  local testErr = trainerPool.test(taTest, mlp)
+  print("testError: " .. testErr)
+
+end
 
 
 --test1()
---for i=1, 1 do
---  plotModelOverData(i)
-  plotModelOverData(4)
---end
+test2()
+--plotModelOverData(4, strModelFileTest2)
 --plot1()
 --plot2(4)
