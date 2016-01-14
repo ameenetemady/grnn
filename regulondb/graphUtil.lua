@@ -33,6 +33,8 @@ do
     return taAllTF
   end
 
+  -- desc: run DFS for all nodes that have outgoing links
+  -- return: return stackFinish accumulated during DFS searches
   function graphUtil.DfsSweep(taGraph, visitedNodes)
     local stackFinish = Stack()
     table.foreach(taGraph, 
@@ -45,6 +47,7 @@ do
       return stackFinish
   end
 
+  -- return: the transpose of taGraph
   function graphUtil.getTranspose(taGraph)
     local taGraphT = {}
 
@@ -67,7 +70,8 @@ do
     return taGraphT
   end
 
-  -- using kosaraju's algorithm
+  -- desc: using kosaraju's algorithm
+  -- return: a table which consists of groups of strongly connected nodes
   function graphUtil.getStrongConnected(taGraph)
     local visitedNodes = {}
     local stackFinish = graphUtil.DfsSweep(taGraph, visitedNodes)
@@ -86,17 +90,25 @@ do
       end
     end
 
-    -- put ScId for each edge
-    local taScIds = {}
+    -- put ScId for each node
+    local taScInfo = { taScIds = {}, taScSize = {} }
     for id, taSc in pairs(taStrongConnected) do
       for __, strNode in pairs(taSc) do
-        taScIds[strNode] = id
+
+        -- update taScIds
+        taScInfo.taScIds[strNode] = id
+
+
+        -- update taScSize
+        taScInfo.taScSize[id] = taScInfo.taScSize[id] or 0
+        taScInfo.taScSize[id] = taScInfo.taScSize[id] + 1
       end
     end
 
-    return taStrongConnected, taScIds
+    return taStrongConnected, taScInfo
   end
 
+  -- desc: Depth First Search(DFS) starting from strRoot. Mark the visitedNodes. Once node is done(black) push it to stackFinish
   function graphUtil.Dfs(strRoot, taGraph, visitedNodes, stackFinish)
     -- 1) initialize
     local s = Stack()
@@ -117,14 +129,13 @@ do
         visitedNodes[strCurr] = 1
         s:push(strCurr)
 
-        table.foreach(taNodeInfo.taConnection, function(k, v)
-          local strNeighborName = v[1]
-          if visitedNodes[strNeighborName] == nil then
---            io.write(strNeighborName .. "|")
-            s:push(strNeighborName)
-          end
-        end)
---        print("")
+        table.foreach(taNodeInfo.taConnection, 
+          function(k, v)
+            local strNeighborName = v[1]
+            if visitedNodes[strNeighborName] == nil then
+              s:push(strNeighborName)
+            end
+          end)
 
       end --elseif
 
@@ -132,29 +143,9 @@ do
 
   end -- function
 
-  function getTaSetKeys(taNodes, nColor)
-    local visitedNodes = {}
-    for key, value in pairs(taNodes) do
-      visitedNodes[value] = nColor
-    end
-
-    return visitedNodes
-  end
-
-  function graphUtil.Dfs_forSc(taSC, taGraph, taAsyclicSubgraphs)
-
-    for key, value in pairs(taSC) do
-        local stackFinish = Stack()
-        local visitedNodes = getTaSetKeys(taSC, 2)
-        visitedNodes[value] = nil
-        graphUtil.Dfs(value, taGraph, visitedNodes, stackFinish)
-        print(value .. ":" .. tostring(stackFinish))
-        taAsyclicSubgraphs[value] = stackFinish._stack
-    end
-
-  end
-
-  function graphUtil.removeEdgesFromSameSC(strNodeName, taNodeInfo, taScIds)
+  -- remove the edges which are part of a loop
+  function graphUtil.removeEdgesFromSameSC(strNodeName, taNodeInfo, taScInfo)
+    local taScIds = taScInfo.taScIds
 
     for key, taNeighbor in pairs(taNodeInfo.taConnection) do
       local strNeighborName = taNeighbor[1]
@@ -164,38 +155,38 @@ do
     end--for
   end
 
+  function graphUtil.removeEdgesFromScToCycle(strNodeName, taNodeInfo, taScInfo)
 
---[[
-  function graphUtil.getDeepCopy(taGraph)
-    local taGraphCopy = {}
-    for oKey, oVal in taGraph do
-      local taNodeInfoCopy = {}
-      taGraphCopy[oKey] = graphUtil.getCopyNodeInfo(oVal)
-    end
+    local taScSize = taScInfo.taScSize
+    local taScIds = taScInfo.taScIds
 
-    return taGraphCopy
+    for key, taNeighbor in pairs(taNodeInfo.taConnection) do
+      local strNeighborName = taNeighbor[1]
+      if taScSize[taScIds[strNeighborName]] > 1 then
+        table.remove(taNodeInfo.taConnection, key)
+      end --if
+    end--for
+
   end
-  --]]
 
+  -- return: a new graph, where edges that:
+  -- A) participate in a cycle(loop) are removed
+  -- B) points a node from a StrongComponent(SC) to another SC which has a loop
   function graphUtil.getACyclicSubgraphs(taGraph)
-    local taStrongConnected, taScIds = graphUtil.getStrongConnected(taGraph)
+    local taStrongConnected, taScInfo= graphUtil.getStrongConnected(taGraph)
     local taAsyclicSubgraphs = {}
 
     local taGraphCopy = myUtil.getDeepCopy(taGraph)
     
     for strNodeName, taNodeInfo in pairs(taGraphCopy) do 
-      graphUtil.removeEdgesFromSameSC(strNodeName, taNodeInfo, taScIds)
+      graphUtil.removeEdgesFromSameSC(strNodeName, taNodeInfo, taScInfo) --A)
+      graphUtil.removeEdgesFromScToCycle(strNode, taNodeInfo, taScInfo) -- B)
     end
-
-    --[[
-    for k, taSC in pairs(taStrongConnected) do
-      graphUtil.Dfs_forSc(taSC, taGraph, taAsyclicSubgraphs)
-    end
-    --]]
 
     return taGraphCopy
   end
 
+  -- desc: print the graph
   function  graphUtil.printGraph_flat(taGraph)
     if taGraph == nil then
       return
