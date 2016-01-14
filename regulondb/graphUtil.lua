@@ -1,4 +1,5 @@
 local csv = require("csv")
+local myUtil = require("../../MyCommon/util.lua")
 require("../../MyCommon/Stack.lua")
 
 do
@@ -66,6 +67,7 @@ do
     return taGraphT
   end
 
+  -- using kosaraju's algorithm
   function graphUtil.getStrongConnected(taGraph)
     local visitedNodes = {}
     local stackFinish = graphUtil.DfsSweep(taGraph, visitedNodes)
@@ -84,7 +86,15 @@ do
       end
     end
 
-    return taStrongConnected
+    -- put ScId for each edge
+    local taScIds = {}
+    for id, taSc in pairs(taStrongConnected) do
+      for __, strNode in pairs(taSc) do
+        taScIds[strNode] = id
+      end
+    end
+
+    return taStrongConnected, taScIds
   end
 
   function graphUtil.Dfs(strRoot, taGraph, visitedNodes, stackFinish)
@@ -122,6 +132,70 @@ do
 
   end -- function
 
+  function getTaSetKeys(taNodes, nColor)
+    local visitedNodes = {}
+    for key, value in pairs(taNodes) do
+      visitedNodes[value] = nColor
+    end
+
+    return visitedNodes
+  end
+
+  function graphUtil.Dfs_forSc(taSC, taGraph, taAsyclicSubgraphs)
+
+    for key, value in pairs(taSC) do
+        local stackFinish = Stack()
+        local visitedNodes = getTaSetKeys(taSC, 2)
+        visitedNodes[value] = nil
+        graphUtil.Dfs(value, taGraph, visitedNodes, stackFinish)
+        print(value .. ":" .. tostring(stackFinish))
+        taAsyclicSubgraphs[value] = stackFinish._stack
+    end
+
+  end
+
+  function graphUtil.removeEdgesFromSameSC(strNodeName, taNodeInfo, taScIds)
+
+    for key, taNeighbor in pairs(taNodeInfo.taConnection) do
+      local strNeighborName = taNeighbor[1]
+      if taScIds[strNodeName] == taScIds[strNeighborName] then -- sameSC
+        table.remove(taNodeInfo.taConnection, key)
+      end --if
+    end--for
+  end
+
+
+--[[
+  function graphUtil.getDeepCopy(taGraph)
+    local taGraphCopy = {}
+    for oKey, oVal in taGraph do
+      local taNodeInfoCopy = {}
+      taGraphCopy[oKey] = graphUtil.getCopyNodeInfo(oVal)
+    end
+
+    return taGraphCopy
+  end
+  --]]
+
+  function graphUtil.getACyclicSubgraphs(taGraph)
+    local taStrongConnected, taScIds = graphUtil.getStrongConnected(taGraph)
+    local taAsyclicSubgraphs = {}
+
+    local taGraphCopy = myUtil.getDeepCopy(taGraph)
+    
+    for strNodeName, taNodeInfo in pairs(taGraphCopy) do 
+      graphUtil.removeEdgesFromSameSC(strNodeName, taNodeInfo, taScIds)
+    end
+
+    --[[
+    for k, taSC in pairs(taStrongConnected) do
+      graphUtil.Dfs_forSc(taSC, taGraph, taAsyclicSubgraphs)
+    end
+    --]]
+
+    return taGraphCopy
+  end
+
   function  graphUtil.printGraph_flat(taGraph)
     if taGraph == nil then
       return
@@ -138,7 +212,6 @@ do
      end
   end
   
--- graphUtil.load_tf_gene()
   return graphUtil
 
 end
