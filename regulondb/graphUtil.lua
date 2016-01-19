@@ -5,9 +5,9 @@ require("../../MyCommon/Stack.lua")
 do
   local graphUtil = {}
 
-  function graphUtil.load_tf_gene()
+  function graphUtil.load_tf_gene(strFilename)
       local taLoadParams = {header=false}
-      local strFilename = "processed/network_tf_gene_noHeader.txt" 
+      local strFilename = "processed/" .. strFilename -- network_tf_gene_noHeader.txt" 
       local f = csv.open(strFilename, taLoadParams)
 
       local taAllTF = {}
@@ -90,6 +90,7 @@ do
       end
     end
 
+    -- ** extra post processing: **
     -- put ScId for each node
     local taScInfo = { taScIds = {}, taScSize = {} }
     for id, taSc in pairs(taStrongConnected) do
@@ -169,6 +170,70 @@ do
 
   end
 
+  function graphUtil.addNodeMetaInfo(taGraph)
+
+    local taNIn = {}
+    -- Calc 
+    for strNodeName,taNodeInfo in pairs(taGraph) do
+      for __, taNeighbor in pairs(taNodeInfo.taConnection) do
+        local strNeighborName = taNeighbor[1]
+
+        local nIn = taNIn[strNeighborName] or 0
+        taNIn[strNeighborName] = nIn + 1
+      end
+    end
+
+    -- Fill
+    for key, value in pairs(taNIn) do
+      local taNodeInfo = taGraph[key]
+      if taNodeInfo == nil then
+        taNodeInfo = { taConnection = {} }
+        taGraph[key] = taNodeInfo
+      end
+
+      taNodeInfo.nIn = value
+    end
+
+
+  end
+
+  function graphUtil.removeEdgesIf(taGraph, fRemove)
+    for strNodeName, taNodeInfo in pairs(taGraph) do
+      for key, taConnection in pairs(taNodeInfo.taConnection) do 
+        local strNeighborName = taConnection[1]
+        local taNeighborInfo = taGraph[strNeighborName]
+        if fRemove(strNeighborName, taNeighborInfo) then
+          taNodeInfo.taConnection[key] = nil
+        end
+      end
+    end
+
+  end
+
+  function graphUtil.getCascadeSubgraphs(taGraph)
+    local taACyclicGraph = graphUtil.getACyclicSubgraphs(taGraph)
+    graphUtil.addNodeMetaInfo(taACyclicGraph)
+
+    graphUtil.removeEdgesIf(taACyclicGraph, 
+      function(strNodeName, taNodeInfo)
+        return taNodeInfo ~= nil and taNodeInfo.nIn ~= nil and taNodeInfo.nIn > 1
+      end)
+
+   return taACyclicGraph
+  end
+
+  function graphUtil.removeSelfLinks(taGraph)
+     for strNodeName, taNodeInfo in pairs(taGraph) do
+       for ikey, taConnection in pairs(taNodeInfo.taConnection) do
+         local strNeighborName = taConnection[1]
+         if strNeighborName == strNodeName then
+           taNodeInfo.taConnection[ikey] = nil
+         end
+       end
+     end
+
+  end
+
   -- return: a new graph, where edges that:
   -- A) participate in a cycle(loop) are removed
   -- B) points a node from a StrongComponent(SC) to another SC which has a loop
@@ -187,19 +252,22 @@ do
   end
 
   -- desc: print the graph
-  function  graphUtil.printGraph_flat(taGraph)
+  function  graphUtil.printGraph_flat(taGraph, isIncludeLeafNode)
     if taGraph == nil then
       return
     end
 
      for key,value in pairs(taGraph) do
-       io.write(key .. ":")
-       for key, value in pairs(value.taConnection) do
-         local v2 = value[2] or ""
-         local v3 = value[3] or ""
-         io.write(value[1] .. "," .. v2 .. "," .. v3 .. "|" )
+       if  (value.taConnection ~= nil and #value.taConnection ~= 0) or isIncludeLeafNode then
+         io.write(key .. ":")
+         for ikey, ivalue in pairs(value.taConnection) do
+           local v1 = ivalue[1] or ""
+           local v2 = ivalue[2] or ""
+           local v3 = ivalue[3] or ""
+           io.write(v1 .. "," .. v2 .. "," .. v3 .. "|" )
+         end
+         print("")
        end
-       print("")
      end
   end
   
