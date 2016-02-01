@@ -146,14 +146,12 @@ end
 
 
 function graphUtil_test.getCascadeSubgraphs_test2()
-  strFilename = "network_tf_All_noHeader.txt" 
   local taTFAll = graphUtil.load_tf_gene(strFilename)
   local taTrimmedGraph = graphUtil.getCascadeSubgraphs(taTFAll)
   graphUtil.printGraph_flat(taTrimmedGraph, false)
 end
 
 function graphUtil_test.getCascadeSubgraphs_test3()
-  strFilename = "network_tf_All_noHeader.txt" 
   local taTFAll = graphUtil.load_tf_gene(strFilename)
   graphUtil.removeSelfLinks(taTFAll)
   local taTrimmedGraph = graphUtil.getCascadeSubgraphs(taTFAll)
@@ -174,6 +172,17 @@ function graphUtil_test.getCascadeSubgraphs_test3()
 
 end
 
+function graphUtil_test.stat()
+  local taTFAll = graphUtil.load_tf_gene(strFilename)
+  local counter = 0
+  for i, k in pairs(taTFAll) do
+    print(i)
+ --   counter = counter +1
+  end
+
+--  print("Number of TFs:" .. counter)
+end
+
 
 function graphUtil_test.all()
 --  graphUtil_test.load_tf_gene_test1()
@@ -192,7 +201,8 @@ function graphUtil_test.all()
 --  graphUtil_test.getCascadeSubgraphs_test1B()
 --  graphUtil_test.getCascadeSubgraphs_test1C()
 --  graphUtil_test.getCascadeSubgraphs_test2()
-  graphUtil_test.getCascadeSubgraphs_test3()
+--  graphUtil_test.getCascadeSubgraphs_test3()
+  graphUtil_test.stat()
 end
 
 graphUtil_test.all()

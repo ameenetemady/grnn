@@ -137,10 +137,10 @@ end
 function multiPlot(strModelFilename, strFigureFilename)
   --margins screen .1, .95, .1, .9 spacing screen 0.05
 
---  gnuplot.pdffigure(strFigureFilename)
-gnuplot.raw('set terminal pdf')
-gnuplot.raw('set output "' .. strFigureFilename .. '"')
+  gnuplot.raw('set terminal pdf')
+  gnuplot.raw('set output "' .. strFigureFilename .. '"')
 
+  gnuplot.raw('set xtics nomirror; set ytics nomirror; set border 3;')
   gnuplot.raw('set xtics 0.25')
   gnuplot.raw('set ytics 0.25')
   gnuplot.raw('set multiplot') -- layout 2,2 columnsfirst title "Fitting"')
@@ -148,6 +148,7 @@ gnuplot.raw('set output "' .. strFigureFilename .. '"')
   gnuplot.raw('set size 0.49,0.49')
   plotModelOverData(1, strModelFilename)
 
+  gnuplot.raw('set key off')
   gnuplot.raw('set origin 0.0,0.5')
   gnuplot.raw('set size 0.49,0.49')
   plotModelOverData(2, strModelFilename)
@@ -165,7 +166,7 @@ gnuplot.raw('set output "' .. strFigureFilename .. '"')
 end
 
 --test1()
---test2()
-multiPlot(strModelFileTest2, "cascade_noisydata_fitted.pdf")
+test2()
+--multiPlot(strModelFileTest2, "cascade_noisydata_fitted.pdf")
 --plot1()
 --plot2(4)

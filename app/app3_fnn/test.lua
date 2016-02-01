@@ -71,3 +71,6 @@ end
 --test1(3)
 
 test2(0)
+test2(1)
+test2(2)
+test2(3)

@@ -9,10 +9,15 @@ do
                     Sigma70 = "rpoD" }
 
   info.taMyGeneGroups = { { "cpxR", "csgD", "yhbS"}, -- (-, -) (Sigma38, Sigma38, ?)
-                         { "cpxR", "csgD", "yhbT"}, -- (-, -) (Sigma38, Sigma38, ?)
-                         { "cpxR", "csgD", "yccT"}, -- (-, +) (Sigma38, Sigma38, ?)
-                         { "cpxR", "csgD", "yccJ"}, -- (-, +) (Sigma38, Sigma38, Sigma38)
+                          { "cpxR", "csgD", "yhbT"}, -- (-, -) (Sigma38, Sigma38, ?)
+                          { "cpxR", "csgD", "yccT"}, -- (-, +) (Sigma38, Sigma38, ?)
+                          { "cpxR", "csgD", "yccJ"}, -- (-, +) (Sigma38, Sigma38, Sigma38)
+                          { "rpoS", "cpxR"}, -- 5
+                          { "rpoS", "csgD"}, -- 6
+                          { "rpoS", "yccJ"}, -- 7
+                          { "hns", "rcsB"}, -- 8
                        }
+
 
   return info
 end
