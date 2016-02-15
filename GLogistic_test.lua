@@ -10,12 +10,12 @@ local GLogistic_test = {}
 
 
 function GLogistic_test.GLogistic_getOutput_test1()
-  local input = torch.linspace(-10, 10, 200)
+  local input = torch.linspace(0, 1, 200)
   local output1 = GLogistic_getOutput(input, torch.Tensor({1, 2, 3, 2}))
   local output2 = GLogistic_getOutput(input, torch.Tensor({1, -2, 3, 2}))
 
-  gnuplot.plot({'1', input, output1, 'points pt 2 ps 0.4'}, 
-               {'2', input, output2, 'points pt 2 ps 0.2 lc rgb "red"'})
+  gnuplot.plot({'1', input, output1, 'points pt 2 ps 0.4'})
+--               {'2', input, output2, 'points pt 2 ps 0.2 lc rgb "red"'})
 
 end
 
@@ -170,8 +170,8 @@ function  GLogistic_test.all()
 --  GLogistic_test.forward_test1()
 --  GLogistic_test.updateGradInput_test1()
 --  GLogistic_test.accGradParameters_test1()
---  GLogistic_test.accGradParameters_test2()
-  GLogistic_test.accGradParameters_test4()
+  GLogistic_test.accGradParameters_test2()
+--  GLogistic_test.accGradParameters_test4()
 end
 
 GLogistic_test.all()
