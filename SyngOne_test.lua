@@ -7,7 +7,7 @@ require('./ExpParametric.lua')
 local myUtil = require('../MyCommon/util.lua')
 local trainerPool = require('../MyCommon/trainerPool.lua')
 local grnnUtil = require('./grnnUtil.lua')
-
+autograd = require 'autograd'
 
 local SyngOne_test = {}
 
@@ -147,6 +147,93 @@ function SyngOne_test.SyngOne_ExpParametric_integrate_test1()
 
 end
 
+local fuSyngOneAuto = function (input, weight, bias)
+  local output = nil
+
+  local nInputWidth = weight:size(1)
+  assert(input:size(2) == nInputWidth, "dimentions don't match")
+
+  for i=1, nInputWidth do
+    local a0 = weight[i][1]
+    local a1 = weight[i][2]
+    local b = weight[i][3]
+    local c = weight[i][4]
+
+    local y = torch.exp(torch.add(torch.mul(input, b), c))
+    local value = torch.add(torch.mul(y, a1), a0)
+
+    if output == nil then
+      output = value
+
+    else
+      output = torch.cat(output, value, 2)
+    end
+  end
+
+  return output
+end
+
+local fuSyngOneAuto2 = function (input, weight, bias)
+  local output = nil
+
+  local nInputWidth = weight:size(1)
+  assert(input:size(2) == nInputWidth, "dimentions don't match")
+
+  for i=1, nInputWidth do
+    local a0 = weight[i][1]
+    local a1 = weight[i][2]
+    local b = weight[i][3]
+    local c = weight[i][4]
+
+    local y = torch.exp(torch.add(torch.mul(input, b), c))
+    local value = torch.add(torch.mul(y, a1), a0)
+
+    if output == nil then
+      output = value
+
+    else
+      output = torch.cat(output, value, 2)
+    end
+  end
+
+  return output
+end
+
+
+
+
+function SyngOne_test.SyngOne_autograd_test1()
+  torch.manualSeed(1)
+
+  local synthWeight_SyngOne = torch.Tensor({{3, 2}})
+  local synthWeight_ExpParametric= torch.Tensor({{-2, 6}})
+
+  local fuMLPFactory = function(weightSynOne, weightExpParametric)
+    local mlp = nn.Sequential()
+    mlp:add(nn.ExpParametric(1, weightExpParametric))
+    mlp:add(nn.SyngOne(1, weightSynOne))
+
+    return mlp
+  end
+
+  local nSize = 500
+  local taData = SyngOne_test.genData2(fuMLPFactory, nSize, synthWeight_SyngOne, synthWeight_ExpParametric)
+
+  local weight = torch.Tensor(1,4):fill(0)
+
+  local mlp = autograd.nn.AutoModule('AutoSyngOne')(fuSyngOneAuto , weight:clone())
+
+
+  grnnUtil.logParams(mlp)
+  trainerPool.full_CG(taData, mlp)
+  grnnUtil.logParams(mlp)
+
+  print("expected parameters")
+  print(synthWeight_SyngOne)
+  print(synthWeight_ExpParametric)
+
+end
+
 function SyngOne_test.genData2(fuMLPFactory, nSize, weightSynOne, weightExpParametric)
   local nInputWidth = weightSynOne:size(1)
   local teX = torch.rand(nSize, nInputWidth)
@@ -194,7 +281,8 @@ function SyngOne_test.all()
 --  SyngOne_test.SyngOne_updateGradInput_test1()
 --  SyngOne_test.accGradParameters_test1()
 --  SyngOne_test.accGradParameters_test2()
-  SyngOne_test.SyngOne_ExpParametric_integrate_test1()
+--  SyngOne_test.SyngOne_ExpParametric_integrate_test1()
+  SyngOne_test.SyngOne_autograd_test1()
 end
 
 SyngOne_test.all()
