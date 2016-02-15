@@ -5,6 +5,7 @@ require 'gnuplot'
 local myUtil = require('../MyCommon/util.lua')
 local trainerPool = require('../MyCommon/trainerPool.lua')
 local grnnUtil = require('./grnnUtil.lua')
+autograd = require 'autograd'
 
 local GLogistic_test = {}
 
@@ -71,6 +72,40 @@ function  GLogistic_test.accGradParameters_test1()
   gLogistic:accGradParameters(input, df_do, 1)
   _, gradParams = gLogistic:getParameters()
   print(gradParams)
+end
+
+local fuGlogisticAuto = function (input, weight, bias)
+
+    local a = weight[1]
+    local b = weight[2]
+    local c = weight[3]
+    local d = weight[4]
+
+    local denominator = torch.add(torch.exp(torch.mul(torch.add(torch.mul(input, -1), c), b)), 1)
+
+    local output = torch.add(torch.mul(torch.pow(denominator, -1), a), d)
+
+    return output
+end
+
+
+function GLogistic_test.autograd_test1()
+  torch.manualSeed(1)
+  local criterion = nn.MSECriterion()
+  local synthWeight = torch.Tensor({1, 2, 3, 2})
+  local nSize = 100 
+
+  local taData = GLogistic_test.genGLogisticData1(synthWeight, nSize)
+  
+  local initWeight = torch.Tensor({0, 0, 0, 0}) -- modify b from 1 to 2
+  local gLogistic  = autograd.nn.AutoModule('GLogisticAuto')(fuGlogisticAuto, initWeight:clone())
+
+  grnnUtil.logParams(gLogistic)
+  trainerPool.full_CG(taData, gLogistic)
+  grnnUtil.logParams(gLogistic)
+
+  print("expected parameters")
+  print(synthWeight)
 end
 
 -- Train b, a, k parameters using single GLogistic
@@ -171,6 +206,7 @@ function  GLogistic_test.all()
 --  GLogistic_test.updateGradInput_test1()
 --  GLogistic_test.accGradParameters_test1()
   GLogistic_test.accGradParameters_test2()
+--GLogistic_test.autograd_test1()
 --  GLogistic_test.accGradParameters_test4()
 end
 

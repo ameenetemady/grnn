@@ -7,7 +7,6 @@ local trainerPool = require('../MyCommon/trainerPool.lua')
 local grnnUtil = require('./grnnUtil.lua')
 
 local fuExpParametric = function (input, weight, bias)
---  local output = torch.Tensor(input:size()):fill(0)
   local output = nil
 
   local nInputWidth = weight:size(1)
