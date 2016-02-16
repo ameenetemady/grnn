@@ -17,6 +17,12 @@ do
   settings.cascade4_big.nInputCols = 5
   settings.cascade4_big.nTargetCols = 4
 
+  settings.SyngTwo7= {}
+  settings.SyngTwo7.inputFilename = "/home/ameen/gnw/app7_SyngTwo/processed/input.tsv"
+  settings.SyngTwo7.targetFilename= "/home/ameen/gnw/app7_SyngTwo/processed/target.tsv"
+  settings.SyngTwo7.nInputCols = 2
+  settings.SyngTwo7.nTargetCols = 1
+
 
   return settings
 end
