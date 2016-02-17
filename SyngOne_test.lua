@@ -200,8 +200,6 @@ local fuSyngOneAuto2 = function (input, weight, bias)
 end
 
 
-
-
 function SyngOne_test.SyngOne_autograd_test1()
   torch.manualSeed(1)
 

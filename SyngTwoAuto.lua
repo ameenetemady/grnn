@@ -3,8 +3,8 @@ local SyngTwoAuto = {}
 
 do
   local fuAutoSyngTwoFull = function(input, w, bias)
-    local x1 = torch.select(input, 2, 1)
-    local x2 = torch.select(input, 2, 2)
+    local x1 = torch.narrow(input, 2, 1, 1)
+    local x2 = torch.narrow(input, 2, 2, 1)
 
     local y1 = torch.exp(torch.mul(torch.add(torch.mul(x1, -1), w[6]), w[7]))
     local y2 = torch.exp(torch.mul(torch.add(torch.mul(x2, -1), w[8]), w[9]))

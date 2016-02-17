@@ -67,4 +67,3 @@ do
   return dataLoad
 end
 
-dataLoad.loadTrainTest()

@@ -16,23 +16,27 @@ end
 
 function test1()
   torch.manualSeed(1)
-  local teInput = dataLoad.loadInput()
-  local teTarget = dataLoad.loadTarget()
-  local taData = grnnUtil.getTable(teInput, teTarget)
+--  local teInput = dataLoad.loadInput()
+--  local teTarget = dataLoad.loadTarget()
+--  local taData = grnnUtil.getTable(teInput, teTarget)
+
+
+  local taTrain, taTest = dataLoad.loadTrainTest()
+  local taData = grnnUtil.getTable(taTrain[1], taTrain[2])
 
 --  local weight = torch.Tensor({-0.5408456,-0.9452248,0.0688278,0.3409350,0.8279240,-0.1653904,-0.0855904,0.1173797,-0.1386029})
-  local weight = torch.Tensor({0.3587919,0.0386136,0.9787060,0.3409350,0.9021380,0.5875384,-7.5971354,0.3412197,-9.1355756})
+--  local weight = torch.Tensor({0.3587919,0.0386136,0.9787060,0.3409350,0.9021380,0.5875384,-7.5971354,0.3412197,-9.1355756})
 --  local weight = torch.Tensor({0, 0, 0, 0, 0, 0, 0, 0, 0})
---  for i=1,10 do
---    print("*** i=" .. i .. " ***")
---    local weight = torch.rand(9)*2 - 1
---    print(myUtil.getCsvStringFrom1dTensor(weight))
+  for i=1,10 do
+    print("*** i=" .. i .. " ***")
+    local weight = torch.rand(9)*2 - 1
     local mlp = syngTwoAuto.new(weight)
     trainerPool.full_CG(taData, mlp)
+    print(myUtil.getCsvStringFrom1dTensor(weight))
 
     local paramOptim, __ = mlp:parameters()
     print(myUtil.getCsvStringFrom1dTensor(paramOptim[1]))
---  end
+  end
 
 end
 
@@ -41,8 +45,8 @@ function plot2()
   local teTarget = dataLoad.loadTarget()
   local taData = grnnUtil.getTable(teInput, teTarget)
 
---  local weight = torch.Tensor({0.3587919,0.0386136,0.9787060,0.3409350,0.9021380,0.5875384,-7.5971354,0.3412197,-9.1355756})
-  local weight = torch.Tensor({-0.5278220,-0.8153228,-0.2068385,-0.6274796,-0.2241785,-0.3088785,0.3394921,-0.2064651,0.8710781})
+  local weight = torch.Tensor({0.3587919,0.0386136,0.9787060,0.3409350,0.9021380,0.5875384,-7.5971354,0.3412197,-9.1355756})
+--  local weight = torch.Tensor({-0.5278220,-0.8153228,-0.2068385,-0.6274796,-0.2241785,-0.3088785,0.3394921,-0.2064651,0.8710781})
   local mlp = syngTwoAuto.new(weight)
   trainerPool.full_CG(taData, mlp)
 
@@ -51,7 +55,27 @@ function plot2()
 
 end
 
+function plot3()
+  local taTrain, taTest = dataLoad.loadTrainTest()
+  local taData = grnnUtil.getTable(taTrain[1], taTrain[2])
+
+ -- local weight = torch.Tensor({0.3587919,0.0386136,0.9787060,0.3409350,0.9021380,0.5875384,-7.5971354,0.3412197,-9.1355756})
+  local weight = torch.Tensor({0.3679708,-0.0090109,0.9802982,0.3409350,1.1657937,0.6065703,-8.2447413,0.3525283,-9.2570497})
+
+  local mlp = syngTwoAuto.new(weight)
+  trainerPool.full_CG(taData, mlp)
+
+  local teOutput = mlp:forward(taTest[1])
+  gnuplot.plot({'1', taTest[2]:squeeze(), teOutput:squeeze(), 'points pt 2 ps 0.4'})
+
+  local testErr = trainerPool.test(taTest, mlp)
+  print("testError: " .. testErr)
+
+end
+
+
 --plot1()
 
 --test1()
-plot2()
+--plot2()
+plot3()

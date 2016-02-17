@@ -23,6 +23,12 @@ do
   settings.SyngTwo7.nInputCols = 2
   settings.SyngTwo7.nTargetCols = 1
 
+  settings.feedforward1= {}
+  settings.feedforward1.inputFilename = "/home/ameen/gnw/app8_FeedForward1/processed/input.tsv"
+  settings.feedforward1.targetFilename= "/home/ameen/gnw/app8_FeedForward1/processed/target.tsv"
+  settings.feedforward1.nInputCols = 1
+  settings.feedforward1.nTargetCols = 2
+
 
   return settings
 end
