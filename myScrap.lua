@@ -1,4 +1,5 @@
 require 'nn'
+require 'gnuplot'
 autograd = require 'autograd'
 require('./ExpParametric.lua')
 
@@ -80,7 +81,22 @@ function genData1(synthWeight, nSize)
 end
 
 
+function myPlot()
+  local teX = torch.linspace(0, 1)
+  local teY = torch.linspace(0, 1)
+  gnuplot.figure(1)
+  gnuplot.raw('set style circle radius graph 0.05')
+  gnuplot.plot(teX, teY, 'circles fs solid')
+--  gnuplot.raw('set obj 15 circle   arc [0 : 360] fc rgb "red')
+--  gnuplot.raw('set obj 15 circle at screen .18,.32   size screen .10  front')
+--  gnuplot.raw('plot sin(x) ')
+
+  gnuplot.plotflush()
+
+
+end
 
 --test1()
-test2()
+--test2()
 
+myPlot()

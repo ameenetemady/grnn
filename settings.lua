@@ -29,6 +29,23 @@ do
   settings.feedforward1.nInputCols = 1
   settings.feedforward1.nTargetCols = 2
 
+  settings.cascadeA= {}
+  settings.cascadeA.inputFilename = "/home/ameen/gnw/app9_cascadeA/processed/input.tsv"
+  settings.cascadeA.targetFilename= "/home/ameen/gnw/app9_cascadeA/processed/target.tsv"
+  settings.cascadeA.nInputCols = 1
+  settings.cascadeA.nTargetCols = 2
+
+  settings.cascadeB= {}
+  settings.cascadeB.inputFilename = "/home/ameen/gnw/app10_cascadeB/processed/input.tsv"
+  settings.cascadeB.targetFilename= "/home/ameen/gnw/app10_cascadeB/processed/target.tsv"
+  settings.cascadeB.nInputCols = 1
+  settings.cascadeB.nTargetCols = 2
+
+  settings.dimA= {}
+  settings.dimA.inputFilename = "/home/ameen/gnw/app11_dimA/processed/input.tsv"
+  settings.dimA.targetFilename= "/home/ameen/gnw/app11_dimA/processed/target.tsv"
+  settings.dimA.nInputCols = 2
+  settings.dimA.nTargetCols = 3
 
   return settings
 end

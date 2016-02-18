@@ -25,14 +25,14 @@ do
   end
 
   function  dataLoad.loadInput()
-    local nInputCols = settings.feedforward1.nInputCols
-    local teInput = dataLoad.loadFromTsv(settings.feedforward1.inputFilename, nInputCols)
+    local nInputCols = settings.dimA.nInputCols
+    local teInput = dataLoad.loadFromTsv(settings.dimA.inputFilename, nInputCols)
     return teInput
   end
 
   function dataLoad.loadTarget()
-    local nTargetCols = settings.feedforward1.nTargetCols
-    local teTarget = dataLoad.loadFromTsv(settings.feedforward1.targetFilename, nTargetCols)
+    local nTargetCols = settings.dimA.nTargetCols
+    local teTarget = dataLoad.loadFromTsv(settings.dimA.targetFilename, nTargetCols)
     return teTarget
 
   end
@@ -47,20 +47,20 @@ do
     local trainMask = torch.mod(teIdx, 2):eq(torch.zeros(nSize))
     local testMask = torch.mod(teIdx, 2):ne(torch.zeros(nSize))
 
-    local teTrain_input = teInput:maskedSelect(torch.ByteTensor(nSize, 1):copy(trainMask))
-    local tmp = torch.ByteTensor(nSize, 2):copy(torch.cat(trainMask, trainMask, 2))
+    local teTrain_input = teInput:maskedSelect(torch.ByteTensor(nSize, 2):copy(torch.cat(trainMask, trainMask, 2)))
+    local tmp = torch.ByteTensor(nSize, 3):copy(torch.cat(trainMask, torch.cat(trainMask, trainMask, 2), 2))
     local teTrain_target = teTarget:maskedSelect(tmp)
-    teTrain_input:resize(trainMask:sum(), 1)
-    teTrain_target:resize(trainMask:sum(), 2)
-
+    teTrain_input:resize(trainMask:sum(), 2)
+    teTrain_target:resize(trainMask:sum(), 3)
+    print(teTrain_target:size())
     local taTrain = {teTrain_input, teTrain_target}
 
     
-    local teTest_input = teInput:maskedSelect(testMask)
-    local teTest_target = teTarget:maskedSelect(torch.cat(testMask, testMask, 2))
-    teTest_input:resize(testMask:sum(), 1)
-    teTest_target:resize(testMask:sum(), 2)
-
+    local teTest_input = teInput:maskedSelect(torch.cat(testMask, testMask, 2))
+    local teTest_target = teTarget:maskedSelect(torch.cat(testMask, torch.cat(testMask, testMask, 2), 2))
+    teTest_input:resize(testMask:sum(), 2)
+    teTest_target:resize(testMask:sum(), 3)
+    print(teTest_target:size())
     local taTest = {teTest_input, teTest_target}
 
     return taTrain, taTest
@@ -69,4 +69,5 @@ do
   return dataLoad
 end
 
-dataLoad.loadTrainTest()
+local x, y = dataLoad.loadTrainTest()
+print(y)

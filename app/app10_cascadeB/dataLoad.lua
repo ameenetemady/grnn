@@ -25,14 +25,14 @@ do
   end
 
   function  dataLoad.loadInput()
-    local nInputCols = settings.feedforward1.nInputCols
-    local teInput = dataLoad.loadFromTsv(settings.feedforward1.inputFilename, nInputCols)
+    local nInputCols = settings.cascadeB.nInputCols
+    local teInput = dataLoad.loadFromTsv(settings.cascadeB.inputFilename, nInputCols)
     return teInput
   end
 
   function dataLoad.loadTarget()
-    local nTargetCols = settings.feedforward1.nTargetCols
-    local teTarget = dataLoad.loadFromTsv(settings.feedforward1.targetFilename, nTargetCols)
+    local nTargetCols = settings.cascadeB.nTargetCols
+    local teTarget = dataLoad.loadFromTsv(settings.cascadeB.targetFilename, nTargetCols)
     return teTarget
 
   end
@@ -52,7 +52,7 @@ do
     local teTrain_target = teTarget:maskedSelect(tmp)
     teTrain_input:resize(trainMask:sum(), 1)
     teTrain_target:resize(trainMask:sum(), 2)
-
+    print(teTrain_target:size())
     local taTrain = {teTrain_input, teTrain_target}
 
     
@@ -60,7 +60,7 @@ do
     local teTest_target = teTarget:maskedSelect(torch.cat(testMask, testMask, 2))
     teTest_input:resize(testMask:sum(), 1)
     teTest_target:resize(testMask:sum(), 2)
-
+    print(teTest_target:size())
     local taTest = {teTest_input, teTest_target}
 
     return taTrain, taTest

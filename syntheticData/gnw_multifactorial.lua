@@ -54,13 +54,49 @@ function gnw_multifactorial.feedforward1()
   local strRes = myUtil.getCsvStringFrom2dTensor(teAll, "\t")
 
   print(strRes)
-
 end
+
+function gnw_multifactorial.cascadeA()
+  local permutGen = PermutationGenerator({0, 0, 0}, {0, 0, 100})
+  local tePerm = permutGen:getNext()
+  local taAll = {}
+
+  while tePerm ~= nil do
+   table.insert(taAll, tePerm:clone())
+   tePerm = permutGen:getNext()
+  end
+
+  local teAll = myUtil.getTensorFromTableOfTensors(taAll)
+  teAll:narrow(2, 3, 1):mul(-0.01)
+  local strRes = myUtil.getCsvStringFrom2dTensor(teAll, "\t")
+
+  print(strRes)
+end
+
+function gnw_multifactorial.dimA()
+  local permutGen = PermutationGenerator({0, 0, 0, 0, 0}, {10, 0, 0, 10, 0})
+  local tePerm = permutGen:getNext()
+  local taAll = {}
+
+  while tePerm ~= nil do
+   table.insert(taAll, tePerm:clone())
+   tePerm = permutGen:getNext()
+  end
+
+  local teAll = myUtil.getTensorFromTableOfTensors(taAll)
+  teAll:mul(-0.1)
+  local strRes = myUtil.getCsvStringFrom2dTensor(teAll, "\t")
+
+  print(strRes)
+end
+
 
 function gnw_multifactorial.all()
 --  gnw_multifactorial.cascade5()
 --  gnw_multifactorial.SyngTwo()
-  gnw_multifactorial.feedforward1()
+--  gnw_multifactorial.feedforward1()
+--  gnw_multifactorial.cascadeA()
+  gnw_multifactorial.dimA()
 end
 
 gnw_multifactorial.all()
