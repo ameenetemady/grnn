@@ -4,6 +4,7 @@ local myUtil = require('../../../MyCommon/util.lua')
 local trainerPool = require('../../../MyCommon/trainerPool.lua')
 local dataLoad = require('./dataLoad.lua')
 local grnnUtil = require('../../grnnUtil.lua')
+local archFactory = require('../../../MyCommon/archFactory.lua')
 
 function plot1()
   local teInput = dataLoad.loadInput()
@@ -23,17 +24,9 @@ function test2(nHiddenLayers, nNodesPerLayer)
   local taTrain, taTest = dataLoad.loadTrainTest()
   local taData = grnnUtil.getTable(taTrain[1], taTrain[2])
 
-  -- 2) Generate Model
-  local mlp = nn.Sequential()
-  mlp:add(nn.Linear(2, nNodesPerLayer))
-  mlp:add(nn.Sigmoid())
 
-  for i=1, nHiddenLayers do
-    mlp:add(nn.Linear(nNodesPerLayer, nNodesPerLayer))
-    mlp:add(nn.Sigmoid())
-  end
-
-  mlp:add(nn.Linear(nNodesPerLayer, 1))
+  local taMlpParam = {nInputs = 2, nOutputs = 1, nNodesPerLayer = nNodesPerLayer, nHiddenLayers = nHiddenLayers} 
+  local mlp = archFactory.mlp(taMlpParam)
 
   -- 3) train Model / load Model
   trainerPool.full_CG(taData, mlp)

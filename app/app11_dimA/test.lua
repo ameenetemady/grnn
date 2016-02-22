@@ -11,22 +11,30 @@ function plot1()
   local teInput = dataLoad.loadInput()
   local teTarget = dataLoad.loadTarget()
 
-  gnuplot.plot({'1', teInput:squeeze(), teTarget:select(2, 1):squeeze(), 'points pt 2 ps 0.4'},
-               {'2', teInput:squeeze(), teTarget:select(2, 2):squeeze(), 'points pt 2 ps 0.4'})
+  gnuplot.plot({'1-2', teInput:select(2, 1):squeeze(), teTarget:select(2, 1):squeeze(), 'points pt 2 ps 0.4'},
+               {'1-3', teInput:select(2, 1):squeeze(), teTarget:select(2, 2):squeeze(), 'points pt 2 ps 0.4'},
+               {'5-3', teInput:select(2, 2):squeeze(), teTarget:select(2, 2):squeeze(), 'points pt 2 ps 0.4'},
+               {'5-10', teInput:select(2, 2):squeeze(), teTarget:select(2, 3):squeeze(), 'points pt 2 ps 0.4'})
 end
 
+local strModelFilename = "dimA_mlp.model"
 
 function feedforwardFactory(param)
 
-  local mlp_g56 = nn.Concat(2)
-  mlp_g56:add(nn.Identity)
-  mlp_g56:add(syngOneAuto.new(param.g6w))
+  local mlp_g2 = nn.Sequential()
+  mlp_g2:add(nn.Narrow(2, 1, 1))
+  mlp_g2:add(syngOneAuto.new(param.g2w))
 
-  local mlp_g5 = syngOneAuto.new(param.g5w)
+  local mlp_g3 = syngTwoAuto.new(param.g3w)
 
-  local main = nn.Sequential()
-  main:add(mlp_g5)
-  main:add(mlp_g56)
+  local mlp_g10 = nn.Sequential()
+  mlp_g10:add(nn.Narrow(2, 2, 1))
+  mlp_g10:add(syngOneAuto.new(param.g10w))
+
+  local main = nn.Concat(2)
+  main:add(mlp_g2)
+  main:add(mlp_g3)
+  main:add(mlp_g10)
 
   return main
 end
@@ -41,13 +49,11 @@ function test1()
 
   for i=1,20 do
     print("*** i=" .. i .. " ***")
-    local param = { g5w = torch.rand(1, 4)*2-1,
-                    g6w = torch.rand(1, 4)*2-1}
+    local param = { g2w = torch.rand(1, 4)*2-1,
+                    g3w = torch.rand(9)*2-1,
+                    g10w = torch.rand(1, 4)*2-1}
 
     local mlp = feedforwardFactory(param)
-
-    print(myUtil.getCsvStringFrom2dTensor(param.g5w))
-    print(myUtil.getCsvStringFrom2dTensor(param.g6w))
 
     trainerPool.full_CG(taData, mlp)
     local trainErr = trainerPool.test(taTrain, mlp)
@@ -56,18 +62,20 @@ function test1()
 
 
     local paramOptim, __ = mlp:getParameters()
-    print(myUtil.getCsvStringFrom1dTensor(paramOptim))
 
     if trainErr < taMinErr.trainErr then
       taMinErr.trainErr = trainErr
       taMinErr.testErr = testErr
       taMinErr.param = paramOptim
       taMinErr.id = i
+      print("saving model " .. i .. " into " .. strModelFilename )
+      torch.save(strModelFilename, mlp)
     end
   end
 
-  print(taMinErr)
 
+  print(taMinErr)
+  print(myUtil.getCsvStringFrom1dTensor(taMinErr.param))
 
 end
 
@@ -77,12 +85,8 @@ function test2(strFigureFilename)
   local teInput = taTest[1]
   local teTarget= taTest[2]
 
---,  
-  local param = { g5w = torch.Tensor({{-0.0629082,0.1962875,2.7342565,-0.9251734}}),
-                  g6w = torch.Tensor({{-0.8252813,1.0768720,-1.2838694,0.4477465}})}
 
-  local mlp = feedforwardFactory(param)
-  local testErr = trainerPool.test(taTest, mlp)
+  local mlp = torch.load(strModelFilename)
 
   local teOutput = mlp:forward(teInput)
 
@@ -95,20 +99,23 @@ function test2(strFigureFilename)
 
   gnuplot.xlabel("Predicted normalized mRNA level")
   gnuplot.ylabel("Observed normalized mRNA level")
---  gnuplot.title("cascade of activator-respressor")
+--  gnuplot.title("DIM circuit")
   gnuplot.axis({0,1.05,0,1.05})
   gnuplot.movelegend('left', 'top')
 
   gnuplot.raw('set style circle radius graph 0.005')
-  gnuplot.plot({'G2', teOutput:select(2, 1):squeeze(), teTarget:select(2, 1):squeeze(), 'circles fs transparent solid 0.6 noborder'},
-               {'G3', teOutput:select(2, 2):squeeze(), teTarget:select(2, 2):squeeze(), 'circles fs transparent solid 0.6 noborder lc rgb "red"'})
+  gnuplot.plot({'G3', teOutput:select(2, 1):squeeze(), teTarget:select(2, 1):squeeze(), 'circles fs transparent solid 0.6 noborder lc rgb "red"'},
+               {'G4', teOutput:select(2, 2):squeeze(), teTarget:select(2, 2):squeeze(), 'circles fs transparent solid 0.6 noborder lc rgb "green"'},
+               {'G5', teOutput:select(2, 3):squeeze(), teTarget:select(2, 3):squeeze(), 'circles fs transparent solid 0.6 noborder lc rgb "blue"'})
 
 
+  local testErr = trainerPool.test(taTest, mlp)
   print("testError: " .. testErr)
 
 end
 
 --plot1()
-
 --test1()
-test2("cascadeB.pdf")
+test2("dimA.pdf")
+
+

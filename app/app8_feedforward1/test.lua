@@ -6,6 +6,7 @@ local dataLoad = require('./dataLoad.lua')
 local grnnUtil = require('../../grnnUtil.lua')
 local syngTwoAuto = require('../../SyngTwoAuto.lua')
 local syngOneAuto = require('../../SyngOneAuto.lua')
+local archFactory = require('../../../MyCommon/archFactory.lua')
 
 function plot1()
   local teInput = dataLoad.loadInput()
@@ -35,10 +36,6 @@ end
 function test1()
   torch.manualSeed(1)
 
---  local teInput = dataLoad.loadInput()
---  local teTarget = dataLoad.loadTarget()
---  local taData = grnnUtil.getTable(teInput, teTarget)
-
   local taTrain, taTest = dataLoad.loadTrainTest()
   local taData = grnnUtil.getTable(taTrain[1], taTrain[2])
 
@@ -62,20 +59,16 @@ function test1()
     print(myUtil.getCsvStringFrom1dTensor(paramOptim))
   end
 
+end
 
- 
+function test1_fnn()
+  local taTrain, taTest = dataLoad.loadTrainTest()
+  local taData = grnnUtil.getTable(taTrain[1], taTrain[2])
 
-  --[[
-  local param = { g6w = torch.Tensor({{1, 1, 1, 1}}),
-                  g7w = torch.Tensor({1.5, 0, 0, 0, 0, 2, 3, 2, 3})}
-
-  local mlp = feedforwardFactory(param)
-
+  local taMlpParam = {nInputs = 1, nOutputs = 2, nNodesPerLayer = 4, nHiddenLayers = 1} 
+  local mlp = archFactory.mlp(taMlpParam)
   trainerPool.full_CG(taData, mlp)
 
-  local teOutput = mlp:forward(teInput)
-  gnuplot.plot({'1', teTarget:select(2, 1, 1):squeeze(), teOutput:select(2, 1, 1):squeeze(), 'points pt 2 ps 0.4'})
-  --]]
 
 end
 
@@ -107,15 +100,15 @@ function test2(strFigureFilename)
   gnuplot.raw('set xtics 0.25')
   gnuplot.raw('set ytics 0.25')
 
-  gnuplot.xlabel("prediction")
-  gnuplot.ylabel("target")
-  gnuplot.title("Feedforward loop (incoherent type 4)")
+  gnuplot.xlabel("Predicted normalized mRNA level")
+  gnuplot.ylabel("Observed normalized level")
+--  gnuplot.title("Feedforward loop (incoherent type 4)")
   gnuplot.axis({0,1.05,0,1.05})
   gnuplot.movelegend('left', 'top')
 
   gnuplot.raw('set style circle radius graph 0.005')
-  gnuplot.plot({'G6', teOutput:select(2, 1):squeeze(), teTarget:select(2, 1):squeeze(), 'circles fs transparent solid 0.6 noborder'},
-               {'G7', teOutput:select(2, 2):squeeze(), teTarget:select(2, 2):squeeze(), 'circles fs transparent solid 0.6 noborder lc rgb "red"'})
+  gnuplot.plot({'G2', teOutput:select(2, 1):squeeze(), teTarget:select(2, 1):squeeze(), 'circles fs transparent solid 0.6 noborder'},
+               {'G3', teOutput:select(2, 2):squeeze(), teTarget:select(2, 2):squeeze(), 'circles fs transparent solid 0.6 noborder lc rgb "red"'})
 
 
   print("testError: " .. testErr)
@@ -124,4 +117,5 @@ end
 
 --plot1()
 --test1()
-test2("feedforward1.pdf")
+test1_fnn()
+--test2("feedforward1.pdf")

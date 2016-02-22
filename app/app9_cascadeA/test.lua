@@ -77,9 +77,9 @@ function test2(strFigureFilename)
   local teInput = taTest[1]
   local teTarget= taTest[2]
 
---,  
-  local param = { g5w = torch.Tensor({{-0.0629082,0.1962875,2.7342565,-0.9251734}}),
-                  g6w = torch.Tensor({{-0.8252813,1.0768720,-1.2838694,0.4477465}})}
+--  ,1.2725742,-1.0934531,-1.5364331,0.1449527
+  local param = { g5w = torch.Tensor({{3.6322124,-1.2578075,-0.3337934,1.0795932}}),
+                  g6w = torch.Tensor({{1.2725742,-1.0934531,-1.5364331,0.1449527}})}
 
   local mlp = feedforwardFactory(param)
   local testErr = trainerPool.test(taTest, mlp)
@@ -95,7 +95,7 @@ function test2(strFigureFilename)
 
   gnuplot.xlabel("Predicted normalized mRNA level")
   gnuplot.ylabel("Observed normalized mRNA level")
---  gnuplot.title("cascade of activator-respressor")
+--  gnuplot.title("cascade of activators")
   gnuplot.axis({0,1.05,0,1.05})
   gnuplot.movelegend('left', 'top')
 
@@ -111,4 +111,4 @@ end
 --plot1()
 
 --test1()
-test2("cascadeB.pdf")
+test2("cascadeA.pdf")
