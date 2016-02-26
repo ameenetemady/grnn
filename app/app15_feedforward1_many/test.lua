@@ -9,11 +9,11 @@ local mySettings = require('../../settings.lua')
 require('./lCommon.lua')
 
 local taBaseSettings = mySettings.feedforward1_many
-local nDatasets = 2 --taBaseSettings.nRuns
+local nDatasets = taBaseSettings.nRuns
 
 function trainMLP(taTaData, taData)
   local taMlpParam = {nInputs = 1, nOutputs = 2, nNodesPerLayer = 5, nHiddenLayers = 0} 
-  local nInits = 5
+  local nInits = 10
 
   local model = nnUtil.getBestTrained(taTaData, taData, nInits, archFactory.mlp, taMlpParam)
 
@@ -21,7 +21,7 @@ function trainMLP(taTaData, taData)
 end
 
 function trainGRNN(taTaData, taData)
-  local nInits = 5
+  local nInits = 10
   local model = nnUtil.getBestTrained(taTaData, taData, nInits, grnnArchFactory.feedforward)
 
   return model
@@ -33,13 +33,16 @@ function evaluateModel(taTest, model)
   end
 
   local mseTest = trainerPool.test(taTest, model)
+  local fractionOut = trainerPool.getFractionOut(taTest, model, 0.15)
 
-  return {mseTest = mseTest}
+  return {mseTest = mseTest,
+          fractionOut = fractionOut}
 end
+
+local taFuModelers = {fnn = trainMLP, grnn = trainGRNN}
 
 function multi_test1()
   local taPerf = {}
-  local taFuModelers = {fnn = trainMLP, grnn = trainGRNN}
   for i=1, nDatasets do
     local taDatasetSettings = genRunSettings(taBaseSettings, i)
     local taTrain, taTest = dataLoad.loadTrainTest(taDatasetSettings)
@@ -52,15 +55,38 @@ function multi_test1()
       taPerf[i][strModelName] =  evaluateModel(taTest, model)
     end
 
+    print("Processed dataSet: " .. i)
+
   end
 
 
   return taPerf
 end
 
+function gen_summary(strTaPerfFilename)
+  local taPerf = torch.load(strTaPerfFilename)
+  local nModels = 2
+  local nSize = nDatasets
+
+  local taPerfInfo = { taFractionOut = {}}
+
+  for strModelName, fuModeler in pairs(taFuModelers) do
+    local teFracOut = torch.Tensor(nSize):fill(1)
+    taPerfInfo.taFractionOut[strModelName] = {}
+
+    for i=1, nSize do
+      teFracOut[i] = taPerf[i][strModelName].fractionOut
+    end
+    taPerfInfo.taFractionOut[strModelName]= teFracOut
+  end
+
+  plotUtil.hist(taPerfInfo.taFractionOut)
+
+end
+
 
 local strTaPerfFilename = "modelPerfs.table"
-local taPerf = multi_test1()
-print(taPerf)
-torch.save(strTaPerfFilename, taPerf)
---gen_summary(strTaPerfFilename)
+--local taPerf = multi_test1()
+--print(taPerf)
+--torch.save(strTaPerfFilename, taPerf)
+gen_summary(strTaPerfFilename)
