@@ -29,6 +29,8 @@ do
   end
 
   function  SyngOneAuto.new(weight)
+    weight = weight or torch.rand(1, 4)*2-1
+
     return autograd.nn.AutoModule('AutoSyngOneFull')(fuAutoSyngOneFull, weight:clone())
   end
 

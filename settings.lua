@@ -47,5 +47,24 @@ do
   settings.dimA.nInputCols = 2
   settings.dimA.nTargetCols = 3
 
+  settings.net9s = {}
+  settings.net9s.inputFilename = "/home/ameen/gnw/app12_net9s/processed/input.tsv"
+  settings.net9s.targetFilename= "/home/ameen/gnw/app12_net9s/processed/target.tsv"
+  settings.net9s.nInputCols = 2
+  settings.net9s.nTargetCols = 7
+
+
+  settings.net9sb = {}
+  settings.net9sb.inputFilename = "/home/ameen/gnw/app14_net9sb/processed/input.tsv"
+  settings.net9sb.targetFilename= "/home/ameen/gnw/app14_net9sb/processed/target.tsv"
+  settings.net9sb.nInputCols = 2
+  settings.net9sb.nTargetCols = 7
+
+  settings.feedforward1_many = {}
+  settings.feedforward1_many.baseDir = "/home/ameen/gnw/app15_feedforward1_many"
+  settings.feedforward1_many.nRuns = 100
+  settings.feedforward1_many.nInputCols = 1
+  settings.feedforward1_many.nTargetCols = 2
+
   return settings
 end

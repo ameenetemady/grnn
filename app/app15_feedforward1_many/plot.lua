@@ -2,29 +2,14 @@ require 'gnuplot'
 local dataLoad = require('../../../MyCommon/dataLoad.lua')
 local plotUtil = require('../../../MyCommon/plotUtil.lua')
 local mySettings = require('../../settings.lua')
+require('./lCommon.lua')
 
 local taBaseSettings = mySettings.feedforward1_many
 local nRuns =  taBaseSettings.nRuns
 local strFigurePrefix = "figure/raw_"
 
-function genRunSettings(id)
-  local taSettings = { 
-    taInput = {
-      strFilename = string.format("%s/d_%d/processed/input.tsv", taBaseSettings.baseDir, id),
-      nCols = taBaseSettings.nInputCols
-    },
-    taTarget = {
-      strFilename = string.format("%s/d_%d/processed/target.tsv", taBaseSettings.baseDir, id),
-      nCols = taBaseSettings.nTargetCols
-    }
-  }
-
-  return taSettings
-
-end
-
 for i=1, nRuns do
-  local taRunSettings = genRunSettings(i)
+  local taRunSettings = genRunSettings(taBaseSettings, i)
   
   local teInput = dataLoad.loadTensorFromTsv(taRunSettings.taInput)
   local teTarget = dataLoad.loadTensorFromTsv(taRunSettings.taTarget)
