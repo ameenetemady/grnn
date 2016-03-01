@@ -35,9 +35,10 @@ function evaluateModel(taTest, model)
   local mseTest = trainerPool.test(taTest, model)
   local fractionOut = trainerPool.getFractionOut(taTest, model, 0.15)
 
+
   return {mseTest = mseTest,
           fractionOut = fractionOut}
-end
+  end
 
 local taFuModelers = {fnn = trainMLP, grnn = trainGRNN}
 
@@ -68,19 +69,24 @@ function gen_summary(strTaPerfFilename)
   local nModels = 2
   local nSize = nDatasets
 
-  local taPerfInfo = { taFractionOut = {}}
+  local taPerfInfo = { taFractionOut = {}, taMse = {}}
 
   for strModelName, fuModeler in pairs(taFuModelers) do
     local teFracOut = torch.Tensor(nSize):fill(1)
-    taPerfInfo.taFractionOut[strModelName] = {}
+    local teMse = torch.Tensor(nSize):fill(1)
 
     for i=1, nSize do
       teFracOut[i] = taPerf[i][strModelName].fractionOut
+      teMse[i] = taPerf[i][strModelName].mseTest
     end
+
     taPerfInfo.taFractionOut[strModelName]= teFracOut
+    taPerfInfo.taMse[strModelName]= teMse
   end
 
-  plotUtil.hist(taPerfInfo.taFractionOut)
+--  plotUtil.hist(taPerfInfo.taFractionOut)
+  plotUtil.hist(taPerfInfo.taFractionOut, {nBins = 13, strFigureFilename = "summary/fractionOut.pdf", title = "Histogram for fraction of predictions with >0.15 error"})
+  plotUtil.hist(taPerfInfo.taMse, {nBins = 13, min = 0, max= 0.02, strFigureFilename = "summary/mse.pdf", title = "Histogram MSE "})
 
 end
 
