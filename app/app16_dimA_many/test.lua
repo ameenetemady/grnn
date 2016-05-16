@@ -8,11 +8,11 @@ local grnnArchFactory = require('../../grnnArchFactory.lua')
 local mySettings = require('../../settings.lua')
 require('./lCommon.lua')
 
-local taBaseSettings = mySettings.feedforward1_many
+local taBaseSettings = mySettings.dimA_many
 local nDatasets = taBaseSettings.nRuns
 
 function trainMLP(taTaData, taData)
-  local taMlpParam = {nInputs = 1, nOutputs = 2, nNodesPerLayer = 5, nHiddenLayers = 0} 
+  local taMlpParam = {nInputs = 2, nOutputs = 3, nNodesPerLayer = 5, nHiddenLayers = 0} 
   local nInits = 10
 
   local model = nnUtil.getBestTrained(taTaData, taData, nInits, archFactory.mlp, taMlpParam)
@@ -22,7 +22,7 @@ end
 
 function trainGRNN(taTaData, taData)
   local nInits = 10
-  local model = nnUtil.getBestTrained(taTaData, taData, nInits, grnnArchFactory.feedforward)
+  local model = nnUtil.getBestTrained(taTaData, taData, nInits, grnnArchFactory.dimA)
 
   return model
 end

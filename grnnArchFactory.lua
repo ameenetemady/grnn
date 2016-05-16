@@ -23,5 +23,28 @@ do
     return main
   end
 
+  function archFactory.dimA(param)
+    param = param or {}
+
+
+    local mlp_g2 = nn.Sequential()
+    mlp_g2:add(nn.Narrow(2, 1, 1))
+    mlp_g2:add(syngOneAuto.new(param.g2w))
+
+    local mlp_g3 = syngTwoAuto.new(param.g3w)
+
+    local mlp_g10 = nn.Sequential()
+    mlp_g10:add(nn.Narrow(2, 2, 1))
+    mlp_g10:add(syngOneAuto.new(param.g10w))
+
+    local main = nn.Concat(2)
+    main:add(mlp_g2)
+    main:add(mlp_g3)
+    main:add(mlp_g10)
+
+    return main
+
+  end
+
   return archFactory
 end
