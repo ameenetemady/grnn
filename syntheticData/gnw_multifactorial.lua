@@ -39,6 +39,26 @@ function gnw_multifactorial.SyngTwo()
 
 end
 
+
+function gnw_multifactorial.feedforward1SKO()
+  local permutGen = PermutationGenerator({0, 0, -50}, {1, 1, 50})
+  local tePerm = permutGen:getNext()
+  local taAll = {}
+
+  while tePerm ~= nil do
+   table.insert(taAll, tePerm:clone())
+   tePerm = permutGen:getNext()
+  end
+
+  local teAll = myUtil.getTensorFromTableOfTensors(taAll)
+  teAll:narrow(2, 3, 1):mul(-0.02)
+  teAll:narrow(2, 1, 2):mul(-1)
+  local strRes = myUtil.getCsvStringFrom2dTensor(teAll, "\t")
+
+  print(strRes)
+
+end
+
 function gnw_multifactorial.feedforward1()
   local permutGen = PermutationGenerator({0, 0, 0}, {0, 0, 100})
   local tePerm = permutGen:getNext()
@@ -147,11 +167,12 @@ function gnw_multifactorial.all()
 --  gnw_multifactorial.cascade5()
 --  gnw_multifactorial.SyngTwo()
 --  gnw_multifactorial.feedforward1()
+    gnw_multifactorial.feedforward1SKO()
 --  gnw_multifactorial.cascadeA()
 --  gnw_multifactorial.dimA()
 --  gnw_multifactorial.net9s()
 --  gnw_multifactorial.net10s()
-  gnw_multifactorial.net9sb()
+--  gnw_multifactorial.net9sb()
 end
 
 gnw_multifactorial.all()
