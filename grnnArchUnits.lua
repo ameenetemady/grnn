@@ -1,5 +1,6 @@
 require 'nn'
-require('./addedFramework.lua')
+require('./torchNew/Squeeze.lua')
+require('./torchNew/Unsqueeze.lua')
 require('./CMulNoParamBatch.lua')
 
 local grnnArchUnits = {}
@@ -30,7 +31,26 @@ do
     mRes:add(nn.CMulNoParamBatch())
 
     return mRes
+  end
 
+  function grnnArchUnits.bGx(nfArgs, fu, nGid, nNonTFs)
+    local mRes = nn.Concat(3)
+      local mbSeqGx = grnnArchUnits.bSeqGx(nfArgs, fu, nGid)
+      mbSeqGx:add(nn.Unsqueeze(3))
+      mbSeqGx:add(nn.Contiguous())
+    mRes:add(mbSeqGx)
+    mRes:add(nn.Narrow(3, 2, nNonTFs))
+
+    return mRes
+  end
+
+  function grnnArchUnits.aGx(nfArgs, fu, nGid, nNonTFs, nTFid)
+    local mRes = nn.Sequential()
+    mRes:add(nn.Narrow(2, nTFid, nfArgs))
+      local mbGx = grnnArchUnits.bGx(nfArgs, fu, nGid, nNonTFs)
+    mRes:add(mbGx)
+
+    return mRes
   end
 
   return grnnArchUnits

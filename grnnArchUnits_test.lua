@@ -30,11 +30,48 @@ end
 function grnnArchUnits_test.bSeqGx_t1(teInput, fu, nfArgs, nGid)
   local aSeq = nn.Sequential()
   aSeq:add(nn.Narrow(2, 1, nfArgs))
-    local mcGx = grnnArchUnits.bSeqGx(nfArgs, fu, nGid)
-  aSeq:add(mcGx)
+    local mbSeqGx = grnnArchUnits.bSeqGx(nfArgs, fu, nGid)
+  aSeq:add(mbSeqGx)
   local teOutput = aSeq:forward(teInput)
 
   print(teOutput)
+end
+
+function grnnArchUnits_test.bGx_t1(teInput, fu, nGid, nNonTFs)
+  local aSeq = nn.Sequential()
+  aSeq:add(nn.Narrow(2, 1, nfArgs))
+    local mbGx = grnnArchUnits.bGx(nfArgs, fu, nGid, nNonTFs)
+  aSeq:add(mbGx)
+  local teOutput = aSeq:forward(teInput)
+
+  print(teOutput)
+end
+
+function grnnArchUnits_test.aGx_t1(teInput, fu, nGid, nNonTFs, nTFid)
+  local maGx = grnnArchUnits.aGx(nfArgs, fu, nGid, nNonTFs, nTFid)
+  maGx:add(nn.Narrow(3, 1, 1))
+  maGx:add(nn.Squeeze(3))
+  local teOutput = maGx:forward(teInput)
+
+  print(teOutput)
+end
+
+
+function grnnArchUnits_test.aGx_t2(teInput, fu, nGid, nNonTFs, nTFid)
+  local maGx = grnnArchUnits.aGx(nfArgs, fu, nGid, nNonTFs, nTFid)
+  maGx:add(nn.Narrow(3, 1, 1))
+  local teOutput = maGx:forward(teInput)
+
+  local teTarget = teOutput + 0.01
+
+  local criterion = nn.MSECriterion()
+  local f = criterion:forward(teOutput, teTarget)
+
+  -- estimate df/dW
+  local df_do = criterion:backward(teOutput, teTarget)
+  print(df_do)
+  local gradInput = maGx:updateGradInput(teInput, df_do)
+  print(gradInput)
 end
 
 function grnnArchUnits_test.all()
@@ -46,10 +83,15 @@ function grnnArchUnits_test.all()
   end
   local nfArgs = 1
   local nGid = 2
+  local nNonTFs = 2
+  local nTFid = 1
 
 --  grnnArchUnits_test.bGx_t1(teInput, fu, nfArgs)
 --  grnnArchUnits_test.cGx_t1(teInput, fu, nfArgs, nGid)
-  grnnArchUnits_test.bSeqGx_t1(teInput, fu, nfArgs, nGid)
+--  grnnArchUnits_test.bSeqGx_t1(teInput, fu, nfArgs, nGid)
+--  grnnArchUnits_test.bGx_t1(teInput, fu, nGid, nNonTFs)
+--  grnnArchUnits_test.aGx_t1(teInput, fu, nGid, nNonTFs, nTFid)
+--  grnnArchUnits_test.aGx_t2(teInput, fu, nGid, nNonTFs, nTFid)
 end
 
 grnnArchUnits_test.all()
