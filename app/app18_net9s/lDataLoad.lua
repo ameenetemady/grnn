@@ -2,19 +2,12 @@ local dataLoad = dataLoad or require('../../../MyCommon/dataLoad.lua')
 local lDataLoad = {}
 
 do
-  function lDataLoad.getTFTensor(lSettings)
-    local taGenes = dataLoad.getHeader(lSettings.strTFsFilePath)
+  function lDataLoad.getData(strFilePath)
+    local taGenes = dataLoad.getHeader(strFilePath)
+    local taLoadParam = { strFilename = strFilePath, nCols = table.getn(taGenes), taCols = taGenes, isHeader = true }
+    local teData = dataLoad.loadTensorFromTsv(taLoadParam)
 
-    local taCols = {}
-    local nGenes = 0
-    for k, v in pairs(taTFs) do
-      taCols[v]=true
-      nCols = nCols + 1
-    end
-
-    
-    print(taHeader)
-
+    return { taGenes = taGenes, teData = teData }
   end
 
   return lDataLoad
