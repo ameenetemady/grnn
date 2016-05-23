@@ -1,7 +1,7 @@
 local lSettings = require('./lSettings.lua')
 local lDataLoad = require('/lDataLoad.lua')
 
-local exprSettings = lSettings.getExprSetting("d_1")
+local exprSettings = lSettings.getExprSetting("d_1_small")
 local taTFs = lDataLoad.getData(exprSettings.strTFsFilePath)
 local taNonTF = lDataLoad.getData(exprSettings.strNonTFsFilePath)
 local taKOs = lDataLoad.getData(exprSettings.strKOsFilePath)
