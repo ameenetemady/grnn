@@ -1,8 +1,8 @@
-local syngTwoAuto = require('./SyngTwoAuto.lua')
-local syngOneAuto = require('./SyngOneAuto.lua')
+local syngTwoAuto = syngTwoAuto or require('./SyngTwoAuto.lua')
+local syngOneAuto = syngOneAuto or require('./SyngOneAuto.lua')
 
 
-local grnnArchUnits = require('./grnnArchUnits.lua')
+local grnnArchUnits = grnnArchUnits or require('./grnnArchUnits.lua')
 
 local grnnArchUnits_test = {}
 
@@ -16,10 +16,10 @@ function grnnArchUnits_test.bGx_t1(teInput, fu, nfArgs)
   print(teOutput)
 end
 
-function grnnArchUnits_test.cGx_t1(teInput, fu, nfArgs)
+function grnnArchUnits_test.cGx_t1(teInput, fu, nfArgs, nGid)
   local aSeq = nn.Sequential()
   aSeq:add(nn.Narrow(2, 1, nfArgs))
-    local mcGx = grnnArchUnits.cGx(nfArgs, fu)
+    local mcGx = grnnArchUnits.cGx(nfArgs, fu, nGid)
   aSeq:add(mcGx)
   local teOutput = aSeq:forward(teInput)
 
@@ -27,16 +27,29 @@ function grnnArchUnits_test.cGx_t1(teInput, fu, nfArgs)
 
 end
 
+function grnnArchUnits_test.bSeqGx_t1(teInput, fu, nfArgs, nGid)
+  local aSeq = nn.Sequential()
+  aSeq:add(nn.Narrow(2, 1, nfArgs))
+    local mcGx = grnnArchUnits.bSeqGx(nfArgs, fu, nGid)
+  aSeq:add(mcGx)
+  local teOutput = aSeq:forward(teInput)
+
+  print(teOutput)
+end
+
 function grnnArchUnits_test.all()
-  local teInput = torch.Tensor({ {{1,10}, {2, 20}} , 
-                                 {{3, 30}, {4, 40}} })
+  local teInput = torch.Tensor({ {{1,10, 100}, {2, 20, 200}} , 
+                                 {{3, 30, 400}, {4, 40, 400}} })
   local fu = function()
     return syngOneAuto.new()
+  --  return nn.Identity()
   end
   local nfArgs = 1
+  local nGid = 2
 
-  --grnnArchUnits_test.bGx_t1(teInput, fu, nfArgs)
-  grnnArchUnits_test.cGx_t1(teInput, fu, nfArgs)
+--  grnnArchUnits_test.bGx_t1(teInput, fu, nfArgs)
+--  grnnArchUnits_test.cGx_t1(teInput, fu, nfArgs, nGid)
+  grnnArchUnits_test.bSeqGx_t1(teInput, fu, nfArgs, nGid)
 end
 
 grnnArchUnits_test.all()
