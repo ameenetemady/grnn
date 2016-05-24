@@ -23,7 +23,18 @@ local teInput = torch.cat(teTFs_3d, teKOs_3d_expanded, 3)
 local mNet9s = grnnArchFactory.net9s()
 local teOutput = mNet9s:forward(teInput)
 
-print(teOutput)
+
+local teTarget = teOutput + 0.01
+
+local criterion = nn.MSECriterion()
+local f = criterion:forward(teOutput, teTarget)
+
+-- estimate df/dW
+local df_do = criterion:backward(teOutput, teTarget)
+print(df_do)
+local gradInput = mNet9s:updateGradInput(teInput, df_do)
+print(gradInput)
+
 
 --[[
 local n=0
