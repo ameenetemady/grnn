@@ -8,7 +8,8 @@ local grnnArchUnits = {}
 do
   function grnnArchUnits.dGx(nfArgs, fu)
     local mRes = nn.Sequential()
-    mRes:add(nn.Narrow(3, 1, nfArgs))
+    mRes:add(nn.Narrow(2, 1, nfArgs))
+    mRes:add(nn.Narrow(3, 1, 1))
     mRes:add(nn.Squeeze(3, 3))
     mRes:add(fu())
 
@@ -19,7 +20,10 @@ do
     local mRes = nn.Concat(2)
       local mdGx = grnnArchUnits.dGx(nfArgs, fu)
     mRes:add(mdGx)
-    mRes:add(nn.Narrow(3, nGid +1, 1))
+      local mToMult = nn.Sequential()
+      mToMult:add(nn.Narrow(3, nGid +1, 1))
+      mToMult:add(nn.Narrow(2, 1, 1))
+    mRes:add(mToMult)
 
     return mRes
   end
@@ -29,6 +33,8 @@ do
       local mcGx = grnnArchUnits.cGx(nfArgs, fu, nGid)
     mRes:add(mcGx)
     mRes:add(nn.CMulNoParamBatch())
+    mRes:add(nn.View(-1, 1, 1))
+    mRes:add(nn.Contiguous())
 
     return mRes
   end
@@ -36,10 +42,11 @@ do
   function grnnArchUnits.bGx(nfArgs, fu, nGid, nNonTFs)
     local mRes = nn.Concat(3)
       local mbSeqGx = grnnArchUnits.bSeqGx(nfArgs, fu, nGid)
-      mbSeqGx:add(nn.Unsqueeze(3))
-      mbSeqGx:add(nn.Contiguous())
     mRes:add(mbSeqGx)
-    mRes:add(nn.Narrow(3, 2, nNonTFs))
+      local mNonTFs = nn.Sequential()
+      mNonTFs:add(nn.Narrow(3, 2, nNonTFs))
+      mNonTFs:add(nn.Narrow(2, 1))
+    mRes:add(mNonTFs)
 
     return mRes
   end

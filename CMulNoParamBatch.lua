@@ -10,7 +10,7 @@ end
 function CMulNoParamBatch:updateOutput(input)
   local nCols = input:size(2)
 
-  assert(nCols == 2, 'input must have two colunms')
+  assert(nCols == 2, string.format("input has %d columns instead of two", nCols))
   local a = input:narrow(2, 1, 1)
   local b = input:narrow(2, 2, 1)
 
@@ -24,7 +24,7 @@ end
 function CMulNoParamBatch:updateGradInput(input, gradOutput)
   local nCols = input:size(2)
 
-  assert(nCols == 2, 'input must have two colunms')
+  assert(nCols == 2, string.format("input has %d columns instead of two", nCols))
   local a = input:narrow(2, 1, 1)
   local b = input:narrow(2, 2, 1)
 

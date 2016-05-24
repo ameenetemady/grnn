@@ -6,7 +6,7 @@ local grnnArchUnits = grnnArchUnits or require('./grnnArchUnits.lua')
 
 local grnnArchUnits_test = {}
 
-function grnnArchUnits_test.bGx_t1(teInput, fu, nfArgs)
+function grnnArchUnits_test.dGx_t1(teInput, fu, nfArgs)
   local aSeq = nn.Sequential()
   aSeq:add(nn.Narrow(2, 1, nfArgs))
     local mdGx = grnnArchUnits.dGx(nfArgs, fu)
@@ -37,7 +37,7 @@ function grnnArchUnits_test.bSeqGx_t1(teInput, fu, nfArgs, nGid)
   print(teOutput)
 end
 
-function grnnArchUnits_test.bGx_t1(teInput, fu, nGid, nNonTFs)
+function grnnArchUnits_test.bGx_t1(teInput, fu, nfArgs,  nGid, nNonTFs)
   local aSeq = nn.Sequential()
   aSeq:add(nn.Narrow(2, 1, nfArgs))
     local mbGx = grnnArchUnits.bGx(nfArgs, fu, nGid, nNonTFs)
@@ -55,6 +55,16 @@ function grnnArchUnits_test.aGx_t1(teInput, fu, nGid, nNonTFs, nTFid)
 
   print(teOutput)
 end
+
+function grnnArchUnits_test.aGx_t3(teInput, fu2, nfArgs, nGid, nNonTFs, nTFid)
+  local maGx = grnnArchUnits.aGx(nfArgs, fu2, nGid, nNonTFs, nTFid)
+  maGx:add(nn.Narrow(3, 1, 1))
+  maGx:add(nn.Squeeze(3))
+  local teOutput = maGx:forward(teInput)
+
+  print(teOutput)
+end
+
 
 
 function grnnArchUnits_test.aGx_t2(teInput, fu, nGid, nNonTFs, nTFid)
@@ -81,17 +91,29 @@ function grnnArchUnits_test.all()
     return syngOneAuto.new()
   --  return nn.Identity()
   end
+
+  local fu2 = function()
+    return syngTwoAuto.new()
+  end
+
+
+
   local nfArgs = 1
   local nGid = 2
   local nNonTFs = 2
   local nTFid = 1
 
---  grnnArchUnits_test.bGx_t1(teInput, fu, nfArgs)
+--  grnnArchUnits_test.dGx_t1(teInput, fu, nfArgs)
+--  grnnArchUnits_test.dGx_t1(teInput, fu2, 2)
 --  grnnArchUnits_test.cGx_t1(teInput, fu, nfArgs, nGid)
+--  grnnArchUnits_test.cGx_t1(teInput, fu2, 2, nGid)
 --  grnnArchUnits_test.bSeqGx_t1(teInput, fu, nfArgs, nGid)
---  grnnArchUnits_test.bGx_t1(teInput, fu, nGid, nNonTFs)
+--  grnnArchUnits_test.bSeqGx_t1(teInput, fu2, 2, nGid)
+--  grnnArchUnits_test.bGx_t1(teInput, fu, nfArgs, nGid, nNonTFs)
+--  grnnArchUnits_test.bGx_t1(teInput, fu2, 2, nGid, nNonTFs)
 --  grnnArchUnits_test.aGx_t1(teInput, fu, nGid, nNonTFs, nTFid)
 --  grnnArchUnits_test.aGx_t2(teInput, fu, nGid, nNonTFs, nTFid)
+--  grnnArchUnits_test.aGx_t3(teInput, fu2, 2, nGid, nNonTFs, nTFid)
 end
 
 grnnArchUnits_test.all()
