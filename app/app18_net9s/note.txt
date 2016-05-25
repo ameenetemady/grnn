@@ -1,0 +1,6 @@
+before error based early stop fix (for 100 iterations):
+  fBest: 0.10472419939713, seed: 27
+  MSE: 0.10151599862335, seed: 26  
+
+when of full: 
+ fBest: 0.097713731231833, seed: 26 

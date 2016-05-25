@@ -6,7 +6,6 @@ local dataLoad = require('./dataLoad.lua')
 local grnnUtil = require('../../grnnUtil.lua')
 local syngTwoAuto = require('../../SyngTwoAuto.lua')
 local syngOneAuto = require('../../SyngOneAuto.lua')
-local archFactory = require('../../../MyCommon/archFactory.lua')
 
 function plot1()
   local teInput = dataLoad.loadInput()
@@ -61,17 +60,6 @@ function test1()
 
 end
 
-function test1_fnn()
-  local taTrain, taTest = dataLoad.loadTrainTest()
-  local taData = grnnUtil.getTable(taTrain[1], taTrain[2])
-
-  local taMlpParam = {nInputs = 1, nOutputs = 2, nNodesPerLayer = 4, nHiddenLayers = 1} 
-  local mlp = archFactory.mlp(taMlpParam)
-  trainerPool.full_CG(taData, mlp)
-
-
-end
-
 function test2(strFigureFilename)
   torch.manualSeed(1)
 
@@ -107,7 +95,9 @@ function test2(strFigureFilename)
   gnuplot.movelegend('left', 'top')
 
   gnuplot.raw('set style circle radius graph 0.005')
-  gnuplot.plot({'G2', teOutput:select(2, 1):squeeze(), teTarget:select(2, 1):squeeze(), 'circles fs transparent solid 0.6 noborder'},
+  local yy = myUtil.getFilledCurve_identity(0, 1.1, 0.10)
+  gnuplot.plot({yy, 'filledcurves fs transparent solid 0.3 noborder'},
+               {'G2', teOutput:select(2, 1):squeeze(), teTarget:select(2, 1):squeeze(), 'circles fs transparent solid 0.6 noborder'},
                {'G3', teOutput:select(2, 2):squeeze(), teTarget:select(2, 2):squeeze(), 'circles fs transparent solid 0.6 noborder lc rgb "red"'})
 
 
@@ -117,5 +107,4 @@ end
 
 --plot1()
 --test1()
-test1_fnn()
---test2("feedforward1.pdf")
+test2("feedforward1.pdf")

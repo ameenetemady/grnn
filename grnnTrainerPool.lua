@@ -7,10 +7,10 @@ do
 
   function trainerPool.getDefaultTrainParams(nRows, strOptimMethod)
 
-    local taTrainParam = {  batchSize = 9, 
-                            --batchSize = math.floor(nRows),
+    local taTrainParam = {  --batchSize = 9, 
+                            batchSize = math.floor(nRows),
                             criterion = nn.MSECriterion(),
-                            maxIteration = 10,
+                            maxIteration = 1000,
                             coefL1 = 0.0,
                             coefL2 = 0.0,
                             strOptimMethod = strOptimMethod or "CG",
@@ -48,7 +48,7 @@ do
 
     for t = 1,nRows, taTrainParam.batchSize do
       -- create batches
-      myUtil.log("batch first item:" .. t, true, taTrainParam.isLog)
+      --myUtil.log("batch first item:" .. t, true, taTrainParam.isLog)
       local nCurrBatchSize = math.min(taTrainParam.batchSize, nRows - t + 1)
       local teBatchX = teInput:narrow(1, t, nCurrBatchSize)
       local teBatchY = teTarget:narrow(1, t, nCurrBatchSize)
@@ -93,25 +93,47 @@ do
       optim.sgd(fuEval, parameters, taTrainParam.taOptimParams)
     end
 
-    return overallErr/(nRows/taTrainParam.batchSize)
+    return trainerPool.getErr(mNet, teInput, teTarget, taTrainParam)
+  end
+
+  function trainerPool.pri_serialize_deserialize(obj)
+    local seriObj = torch.serialize(obj)
+    local deSeriObj = torch.deserialize(seriObj)
+
+    return deSeriObj
+  end
+
+  function trainerPool.getErr(mNet, teInput, teTarget, taTrainParam)
+    local criterion = taTrainParam.criterion
+
+    local teOutput = mNet:forward(teInput)
+    local criterion = nn.MSECriterion()
+    local fErr = criterion:forward(teOutput, teTarget)
+
+    return fErr
+  end
+
+  function trainerPool.runCVExperiment(fuGetArch, teInput, teTarget, nFolds)
+    --Todo: implement
+
   end
 
   function trainerPool.trainGrnn3d(mNet, teInput, teTarget)
     local criterion = nn.MSECriterion()
-    local taTrainParam = trainerPool.getDefaultTrainParams(teInput:size(1))
+    local taTrainParam = trainerPool.getDefaultTrainParams(teInput:size(1),"CG" )
 
     local errPrev = math.huge
-    local errCurr = 0
+    local errCurr = math.huge
 
     for i=1, taTrainParam.maxIteration do
       errCurr = trainerPool.pri_trainGrnn3d_SingleRound(mNet, teInput, teTarget, taTrainParam)
 
-      if errPrev == errCurr then
+      if errPrev <= errCurr then
         print("** early stop **")
-        break
+        return errPrev
       elseif errCurr ~= nil then
         local message = errCurr < errPrev and "<" or "!>"
-        myUtil.log(message, true, taTrainParam.isLog)
+        myUtil.log(message, false, taTrainParam.isLog)
         errPrev = errCurr
       else
         error("invalid value for errCurr!")
@@ -119,6 +141,7 @@ do
 
     end
 
+    return errCurr
   end
 
   return trainerPool

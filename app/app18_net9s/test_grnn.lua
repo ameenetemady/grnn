@@ -1,15 +1,19 @@
+torch.manualSeed(0)
+
 local grnnArchFactory = grnnArchFactory or require('../../grnnArchFactory.lua')
 local trainerPool = trainerPool or require('../..//grnnTrainerPool.lua')
 local lSettings = lSettings or require('./lSettings.lua')
 local lDataLoad = lDataLoad or require('./lDataLoad.lua')
 
 
-local exprSettings = lSettings.getExprSetting("d_1_small")
+--local exprSettings = lSettings.getExprSetting("d_1_small")
+local exprSettings = lSettings.getExprSetting("d_1")
 local taTFs = lDataLoad.getData(exprSettings.strTFsFilePath)
 local taNonTF = lDataLoad.getData(exprSettings.strNonTFsFilePath)
 local taKOs = lDataLoad.getData(exprSettings.strKOsFilePath)
 
 local nRows = taKOs.teData:size(1)
+print("Number of samples: " .. nRows)
 
 local nTFs = taTFs.teData:size(2)
 local teTFs_3d = taTFs.teData:view(nRows, nTFs, 1)
@@ -23,30 +27,25 @@ local teInput = torch.cat(teTFs_3d, teKOs_3d_expanded, 3)
 
 local mNet9s = grnnArchFactory.net9s()
 local teOutput = mNet9s:forward(teInput)
-local teTarget = teOutput + 0.5
+local teTarget = taNonTF.teData
 
-trainerPool.trainGrnn3d(mNet9s, teInput, teTarget)
+local fBest = math.huge
+local fBestId = math.huge
+local nMaxIter = 40
 
+for seed=1, nMaxIter do
+  torch.manualSeed(seed)
+  mNet9s = grnnArchFactory.net9s()
+--  local f = trainerPool.trainGrnn3d(mNet9s, teInput, teTarget)
+  print("MSE:" .. f .. ", seed: " .. seed)
 
-----[[
-local teOutput = mNet9s:forward(teInput)
-local criterion = nn.MSECriterion()
-local f = criterion:forward(teOutput, teTarget)
-print(f)
+  if f < fBest then
+    fBest = f 
+    fBestId = seed
+  end
 
---[[ estimate df/dW
-local df_do = criterion:backward(teOutput, teTarget)
-print(df_do)
-local gradInput = mNet9s:updateGradInput(teInput, df_do)
-print(gradInput)
---]]
-
---[[
-local n=0
-for i=1+n, 10+n do
-  print(teTFs_3d[i])
 end
---]]
+print("fBest: " .. fBest .. ", seed: " .. fBestId)
 
 -- load data from tsvs into: TFs, KO, NonTFs
 -- build 3d data, to include KO record into the TF's 3rd dimension
