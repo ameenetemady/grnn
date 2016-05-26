@@ -6,13 +6,13 @@ local lSettings = lSettings or require('./lSettings.lua')
 local lDataLoad = lDataLoad or require('./lDataLoad.lua')
 
 
-local exprSettings = lSettings.getExprSetting("d_1_small")
+local exprSettings = lSettings.getExprSetting("d_1")
 --local exprSettings = lSettings.getExprSetting("d_1")
 
 -- load:
-local taTFs = lDataLoad.getData(exprSettings.strTFsFilePath)
+local taTFs = lDataLoad.getData(exprSettings.strTFsNoNoiseFilePath)
 local taKOs = lDataLoad.getData(exprSettings.strKOsFilePath)
-local taNonTF = lDataLoad.getData(exprSettings.strNonTFsFilePath)
+local taNonTF = lDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
 
 -- Prepare
 local teInput = torch.cat(taTFs.teData, taKOs.teData, 2) -- todo: is this correct?

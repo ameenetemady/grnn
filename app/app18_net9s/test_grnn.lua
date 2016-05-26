@@ -1,15 +1,15 @@
 torch.manualSeed(0)
 
 local grnnArchFactory = grnnArchFactory or require('../../grnnArchFactory.lua')
-local trainerPool = trainerPool or require('../..//grnnTrainerPool.lua')
+local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')
 local lSettings = lSettings or require('./lSettings.lua')
 local lDataLoad = lDataLoad or require('./lDataLoad.lua')
 
 
 --local exprSettings = lSettings.getExprSetting("d_1_small")
-local exprSettings = lSettings.getExprSetting("d_1")
-local taTFs = lDataLoad.getData(exprSettings.strTFsFilePath)
-local taNonTF = lDataLoad.getData(exprSettings.strNonTFsFilePath)
+local exprSettings = lSettings.getExprSetting("d_2")
+local taTFs = lDataLoad.getData(exprSettings.strTFsNoNoiseFilePath)
+local taNonTF = lDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
 local taKOs = lDataLoad.getData(exprSettings.strKOsFilePath)
 
 local nRows = taKOs.teData:size(1)
@@ -36,7 +36,7 @@ local nMaxIter = 40
 for seed=1, nMaxIter do
   torch.manualSeed(seed)
   mNet9s = grnnArchFactory.net9s()
---  local f = trainerPool.trainGrnn3d(mNet9s, teInput, teTarget)
+  local f = trainerPool.trainGrnn3d(mNet9s, teInput, teTarget)
   print("MSE:" .. f .. ", seed: " .. seed)
 
   if f < fBest then

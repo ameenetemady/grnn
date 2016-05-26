@@ -4,3 +4,10 @@ before error based early stop fix (for 100 iterations):
 
 when of full: 
  fBest: 0.097713731231833, seed: 26 
+
+
+withNoisy,
+  grnn:  d_1: fBest: 0.27404550333119, seed: 4  
+  fnn:   d_1: fBest: 0.14279379134604, seed: 21
+  grnn:  d_2: fBest: 0.51530846411192, seed: 6  
+

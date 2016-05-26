@@ -123,8 +123,8 @@ do
         mReOrder:add(nn.Narrow(2, 1, 1))--2
         mReOrder:add(nn.Narrow(2, 7, 1))--3
         mReOrder:add(nn.Narrow(2, 6, 1))--4
-        mReOrder:add(nn.Narrow(2, 4, 1))--5
-        mReOrder:add(nn.Narrow(2, 5, 1))--6
+        mReOrder:add(nn.Narrow(2, 5, 1))--5
+        mReOrder:add(nn.Narrow(2, 4, 1))--6
         mReOrder:add(nn.Narrow(2, 3, 1))--9
 
     mFinalSeq:add(mReOrder)

@@ -128,7 +128,7 @@ do
     for i=1, taTrainParam.maxIteration do
       errCurr = trainerPool.pri_trainGrnn3d_SingleRound(mNet, teInput, teTarget, taTrainParam)
 
-      if errPrev <= errCurr then
+      if errPrev <= errCurr or myUtil.isNan(errCurr)  then
         print("** early stop **")
         return errPrev
       elseif errCurr ~= nil then
