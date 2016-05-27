@@ -7,7 +7,7 @@ local lDataLoad = lDataLoad or require('./lDataLoad.lua')
 
 
 --local exprSettings = lSettings.getExprSetting("d_1_small")
-local exprSettings = lSettings.getExprSetting("d_2")
+local exprSettings = lSettings.getExprSetting("d_1")
 local taTFs = lDataLoad.getData(exprSettings.strTFsNoNoiseFilePath)
 local taNonTF = lDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
 local taKOs = lDataLoad.getData(exprSettings.strKOsFilePath)
