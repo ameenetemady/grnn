@@ -12,7 +12,11 @@ withNoisy,
   grnn:  d_2: fBest: 0.51530846411192, seed: 6  
 
 
-d_1, noisy:
+d_1, non-noisy:
   grnn: fBest: 1.9790684570113, seed: 32
   fnn0: fBest: 2.4696057769708, seed: 5 
   fnn3: fBest: 2.53113180932, seed: 33 
+
+d_1, noisy:
+  grnn: fBest: 0.22407574728305, seed: 6 
+  grnn: fBest: 0.11862226184625, seed: 8  

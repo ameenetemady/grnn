@@ -6,10 +6,11 @@ local lSettings = lSettings or require('./lSettings.lua')
 local lDataLoad = lDataLoad or require('./lDataLoad.lua')
 
 
---local exprSettings = lSettings.getExprSetting("d_1_small")
 local exprSettings = lSettings.getExprSetting("d_1")
 local taTFs = lDataLoad.getData(exprSettings.strTFsNoNoiseFilePath)
 local taNonTF = lDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
+--local taTFs = lDataLoad.getData(exprSettings.strTFsFilePath)
+--local taNonTF = lDataLoad.getData(exprSettings.strNonTFsFilePath)
 local taKOs = lDataLoad.getData(exprSettings.strKOsFilePath)
 
 local nRows = taKOs.teData:size(1)
@@ -31,7 +32,7 @@ local teTarget = taNonTF.teData
 
 local fBest = math.huge
 local fBestId = math.huge
-local nMaxIter = 40
+local nMaxIter = 20
 
 for seed=1, nMaxIter do
   torch.manualSeed(seed)
