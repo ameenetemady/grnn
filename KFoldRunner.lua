@@ -17,8 +17,40 @@ function KFoldRunner:hasMore()
   return self.nNextFoldId <= self.nFolds
 end
 
+function self:pri_getMaskedSelect(teInput, teMaskDim1)
+  local nRows = teInput:size(1)
+
+  -- expand tensor for maskedCopy
+  local teMaskSize = torch.ones(teInput:size())
+  teMaskSize[1] = nRows
+  local teMask = torch.ByteTesor(teMaskSize)
+  teMask:select(1):copy(teMaskDim1)
+  teMask:expandAs(teInput)
+
+  local teInputMasked = teInput:maskedSelect(teMask)
+  return teInputMasked
+end
+
+function self:pri_getFold(teInput, nFoldId)
+  local nRows = teInput:size(1)
+
+  -- test:
+  local teIdxAll = torch.linspace(1, nRows, nRows)
+  local teMaskDim1 = torch.mod(teIdxAll, self.nFolds):eq(torch.Tensor(nSize):fill(nFoldId-1))
+
+  local teTest = self:pri_getMaskedSelect(teInput, teMaskDim1)
+
+  -- train:
+  teIdxAll = torch.linspace(1, nRows, nRows)
+  teMaskDim1 = torch.mod(teIdxAll, self.nFolds):ne(torch.Tensor(nSize):fill(nFoldId-1))
+
+  local teTrain = self:pri_getMaskedSelect(teInput, teMaskDim1)
+
+  return teTrain, teTest
+end
+
 function KFoldRunner:getNext()
-  if ~self:hasMore() then
+  if not self:hasMore() then
     return nil
   end
 

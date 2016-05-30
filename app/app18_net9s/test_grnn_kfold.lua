@@ -1,3 +1,4 @@
+local testerPool = testerPool or require('../../../MyCommon/testerPool.lua')
 local grnnArchFactory = grnnArchFactory or require('../../grnnArchFactory.lua')
 local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')
 local lSettings = lSettings or require('./lSettings.lua')
@@ -16,7 +17,7 @@ local taParam = {
   teTarget = teTarget, 
   fuArchGen = grnnArchFactory.net9s,
   fuTrainer = trainerPool.trainGrnn3d,
-  fuTester = trainerPool.testGrnn3d }
+  fuTester = testerPool.getMSE}
 
 local kFoldRunner = KFoldRunner.new(taParam)
 while kFoldRunner:hasMore() do
