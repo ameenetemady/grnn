@@ -7,8 +7,9 @@ require('../../FoldRun.lua')
 require('../../KFoldRunner.lua')
 
 
-local teInput = lDataLoad.load3dInput(lSettings)
-local teTarget = lDataLoad.loadTarget(lSettings)
+local exprSettings = lSettings.getExprSetting("d_1_small")
+local teInput = lDataLoad.load3dInput(exprSettings)
+local teTarget = lDataLoad.loadTarget(exprSettings)
 
 local taParam = { 
   nFolds = 2, 
