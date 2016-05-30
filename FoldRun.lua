@@ -1,3 +1,4 @@
+local myUtil = myUtil or require('../MyCommon/util.lua')
 local FoldRun = torch.class("FoldRun")
 
 function FoldRun:__init(taParam)
@@ -27,7 +28,8 @@ function FoldRun:Run()
     local dTrainErr = self.fuTrainer(mNet, teInput_train, teTarget_train, mNetInfo)
 
     if dTrainErr < dBestTrainErr then
-      mBestNet = myUtil.getClone(mNet)
+      dBestTrainErr = dTrainErr
+      mBestNet = myUtil.getMNetClone(mNet)
     end
   end
   assert(dBestTrainErr < math.huge, "training didn't succeed as dBestTrainErr is still mat.huge!")

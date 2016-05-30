@@ -17,32 +17,46 @@ function KFoldRunner:hasMore()
   return self.nNextFoldId <= self.nFolds
 end
 
-function self:pri_getMaskedSelect(teInput, teMaskDim1)
+function KFoldRunner:pri_getMaskedSelect(teInput, teMaskDim1)
   local nRows = teInput:size(1)
 
   -- expand tensor for maskedCopy
-  local teMaskSize = torch.ones(teInput:size())
+  local teMaskSize = teInput:size():fill(1)
   teMaskSize[1] = nRows
-  local teMask = torch.ByteTesor(teMaskSize)
-  teMask:select(1):copy(teMaskDim1)
-  teMask:expandAs(teInput)
+  local teMask = torch.ByteTensor(teMaskSize)
 
-  local teInputMasked = teInput:maskedSelect(teMask)
+  local teInputMasked = nil
+  if teInput:dim() == 2 then
+    teMask:select(2, 1):copy(teMaskDim1)
+    teMask = teMask:expandAs(teInput)
+    teInputMasked = teInput:maskedSelect(teMask)
+    teInputMasked:resize(teMaskDim1:sum(), teInput:size(2))
+
+  elseif teInput:dim(2) == 3 then
+    teMask:select(3, 1):select(2, 1):copy(teMaskDim1)
+    teMask = teMask:expandAs(teInput)
+    teInputMasked = teInput:maskedSelect(teMask)
+    teInputMasked:resize(teMaskDim1:sum(), teInput:size(2), teInput:size(3))
+
+  else
+    error(string.format("nDim = %d not supported!", teInput:dim()))
+  end
+
   return teInputMasked
 end
 
-function self:pri_getFold(teInput, nFoldId)
+function KFoldRunner:pri_getFold(teInput, nFoldId)
   local nRows = teInput:size(1)
 
   -- test:
   local teIdxAll = torch.linspace(1, nRows, nRows)
-  local teMaskDim1 = torch.mod(teIdxAll, self.nFolds):eq(torch.Tensor(nSize):fill(nFoldId-1))
+  local teMaskDim1 = torch.mod(teIdxAll, self.nFolds):eq(torch.Tensor(nRows):fill(nFoldId-1))
 
   local teTest = self:pri_getMaskedSelect(teInput, teMaskDim1)
 
   -- train:
   teIdxAll = torch.linspace(1, nRows, nRows)
-  teMaskDim1 = torch.mod(teIdxAll, self.nFolds):ne(torch.Tensor(nSize):fill(nFoldId-1))
+  teMaskDim1 = torch.mod(teIdxAll, self.nFolds):ne(torch.Tensor(nRows):fill(nFoldId-1))
 
   local teTrain = self:pri_getMaskedSelect(teInput, teMaskDim1)
 
@@ -58,9 +72,9 @@ function KFoldRunner:getNext()
   local teTarget_train, teTarget_test = self:pri_getFold(self.teTarget, self.nNextFoldId)
 
   local taRunParam = {
-    taTrain = { teInput_train, teTarget_train }
+    taTrain = { teInput_train, teTarget_train },
     taTest = { teInput_test, teInput_test },
-    nSeeds = taParam.nSeeds,
+    nSeeds = self.nSeeds,
     fuArchGen = self.fuArchGen,
     fuTrainer = self.fuTrainer,
     fuTester = self.fuTester
