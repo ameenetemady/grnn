@@ -15,8 +15,7 @@ end
 
 function FoldRun:Run()
   local dBestTrainErr = math.huge
-  local mBestNet = nil
-  local mNet, mNetInfo = self.fuArchGen()
+  local mBestNetInfo = nil
 
   -- train (with all seeds)
   for i=1, self.nSeeds do
@@ -25,11 +24,12 @@ function FoldRun:Run()
 
     local teInput_train = self.taTrain[1]
     local teTarget_train = self.taTrain[2]
+    local mNet, mNetInfo = self.fuArchGen()
     local dTrainErr = self.fuTrainer(mNet, teInput_train, teTarget_train, mNetInfo)
 
     if dTrainErr < dBestTrainErr then
       dBestTrainErr = dTrainErr
-      mBestNet = myUtil.getMNetClone(mNet)
+      mBestNetInfo = myUtil.getMNetCloneWeights(mNet, mNetInfo)
     end
   end
   assert(dBestTrainErr < math.huge, "training didn't succeed as dBestTrainErr is still mat.huge!")
