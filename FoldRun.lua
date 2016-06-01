@@ -5,7 +5,8 @@ function FoldRun:__init(taParam)
     self.taTrain = taParam.taTrain
     self.taTest = taParam.taTest
     self.nSeeds = taParam.nSeeds
-    self.fuArchGen = taParam.fuArchGen
+--    self.fuArchGen = taParam.fuArchGen
+    self.mNetAdapter = taParam.mNetAdapter
     self.fuTrainer = taParam.fuTrainer
     self.fuTester = taParam.fuTester
 
@@ -15,28 +16,27 @@ end
 
 function FoldRun:Run()
   local dBestTrainErr = math.huge
-  local mBestNetInfo = nil
+  local mNetAdapterBest = nil
 
   -- train (with all seeds)
   for i=1, self.nSeeds do
     torch.manualSeed(i)
-    mNet:reset()
 
     local teInput_train = self.taTrain[1]
     local teTarget_train = self.taTrain[2]
-    local mNet, mNetInfo = self.fuArchGen()
-    local dTrainErr = self.fuTrainer(mNet, teInput_train, teTarget_train, mNetInfo)
+
+    local dTrainErr = self.fuTrainer(self.mNetAdapter, teInput_train, teTarget_train)
 
     if dTrainErr < dBestTrainErr then
       dBestTrainErr = dTrainErr
-      mBestNetInfo = myUtil.getMNetCloneWeights(mNet, mNetInfo)
+      mNetAdapterBest = self.mNetAdapter:clone()
     end
   end
   assert(dBestTrainErr < math.huge, "training didn't succeed as dBestTrainErr is still mat.huge!")
   self.dTrainErr = dBestTrainErr
 
   -- test
-  self.taTestResult = self.fuTester(mBestNet, self.taTest[1], self.taTest[2])
+  self.taTestResult = self.fuTester(mNetAdapterBest:getRaw(), self.taTest[1], self.taTest[2])
 end
 
 function FoldRun:getSummaryTable()

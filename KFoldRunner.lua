@@ -5,7 +5,8 @@ function KFoldRunner:__init(taParam)
   self.nSeeds = taParam.nSeeds
   self.teInput = taParam.teInput
   self.teTarget = taParam.teTarget
-  self.fuArchGen = taParam.fuArchGen
+--  self.fuArchGen = taParam.fuArchGen
+  self.mNetAdapter = taParam.mNetAdapter
   self.fuTrainer = taParam.fuTrainer
   self.fuTester = taParam.fuTester
 
@@ -75,7 +76,8 @@ function KFoldRunner:getNext()
     taTrain = { teInput_train, teTarget_train },
     taTest = { teInput_test, teInput_test },
     nSeeds = self.nSeeds,
-    fuArchGen = self.fuArchGen,
+    --fuArchGen = self.fuArchGen,
+    mNetAdapter = self.mNetAdapter,
     fuTrainer = self.fuTrainer,
     fuTester = self.fuTester
   }

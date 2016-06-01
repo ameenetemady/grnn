@@ -144,5 +144,33 @@ do
     return errCurr
   end
 
+  function trainerPool.trainGrnn3dMNetAdapter(mNetAdapter, teInput, teTarget)
+    local criterion = nn.MSECriterion()
+    local taTrainParam = trainerPool.getDefaultTrainParams(teInput:size(1),"CG" )
+
+    local errPrev = math.huge
+    local mNetAdapterPrev = nil
+    local errCurr = math.huge
+
+    for i=1, taTrainParam.maxIteration do
+      errCurr = trainerPool.pri_trainGrnn3d_SingleRound(mNetAdapter:getRaw(), teInput, teTarget, taTrainParam)
+
+      if errPrev <= errCurr or myUtil.isNan(errCurr)  then
+        print("** early stop **")
+        return errPrev, mNetAdapterPrev
+      elseif errCurr ~= nil then
+        local message = errCurr < errPrev and "<" or "!>"
+        myUtil.log(message, false, taTrainParam.isLog)
+        errPrev = errCurr
+        mNetAdapterPrev = mNetAdapter:clone()
+      else
+        error("invalid value for errCurr!")
+      end
+
+    end
+
+    return errCurr, mNetAdapter
+  end
+
   return trainerPool
 end

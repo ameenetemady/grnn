@@ -24,14 +24,14 @@ do
 
     local teInput = torch.cat(teTFs_3d, teKOs_3d_expanded, 3)
 
-    return teInput
+    return teInput, taTFs.taGenes, taKOs.taGenes
   end
 
   function lDataLoad.loadTarget(exprSettings)
 
     local taNonTF = lDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
 
-    return taNonTF.teData
+    return taNonTF.teData, taNonTF.taGenes
   end
 
   return lDataLoad
