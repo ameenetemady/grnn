@@ -32,7 +32,7 @@ local teTarget = taNonTF.teData
 
 local fBest = math.huge
 local fBestId = math.huge
-local nMaxIter = 20
+local nMaxIter = 5
 
 for seed=1, nMaxIter do
   torch.manualSeed(seed)

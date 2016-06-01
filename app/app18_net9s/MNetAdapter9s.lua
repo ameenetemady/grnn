@@ -17,21 +17,16 @@ function MNetAdapter9s:__init(taParam, taWeights)
   self.mNet, self.taFu = MNetAdapter9s.getNewMNet(self.taWeights)
 end
 
-function MNetAdapter9s.pri_cloneParams(taParam)
-  return taParam
-end
+--just for testing:
+function MNetAdapter9s:test_addToWeights(dAdd)
+  local taWeights = self:pri_getModelWeights()
 
-function MNetAdapter9s.pri_cloneWeights(taWeights)
-  if taWeights == nil then
-    return nil
-  end
-
-  local taWeightsClone = {}
+  local taWeightsNew = {}
   for k, v in pairs(taWeights) do
-    taWeightsClone[k] = v:clone()
+    taWeightsNew[k] = torch.add(v:clone(), dAdd)
   end
 
-  return taWeightsClone
+  self.mNet, self.taFu = MNetAdapter9s.getNewMNet(taWeightsNew)
 end
 
 function MNetAdapter9s:pri_getModelWeights()
@@ -54,6 +49,24 @@ end
 
 function MNetAdapter9s:getRaw()
   return self.mNet
+end
+
+-- Static Methods:
+function MNetAdapter9s.pri_cloneParams(taParam)
+  return taParam
+end
+
+function MNetAdapter9s.pri_cloneWeights(taWeights)
+  if taWeights == nil then
+    return nil
+  end
+
+  local taWeightsClone = {}
+  for k, v in pairs(taWeights) do
+    taWeightsClone[k] = v:clone()
+  end
+
+  return taWeightsClone
 end
 
 
