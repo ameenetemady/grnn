@@ -74,7 +74,7 @@ function KFoldRunner:getNext()
 
   local taRunParam = {
     taTrain = { teInput_train, teTarget_train },
-    taTest = { teInput_test, teInput_test },
+    taTest = { teInput_test, teTarget_test },
     nSeeds = self.nSeeds,
     --fuArchGen = self.fuArchGen,
     mNetAdapter = self.mNetAdapter,
@@ -94,7 +94,8 @@ function KFoldRunner:getAggrSummaryTable()
   local taAggrSummary = {}
 
   for i=1, self.nFolds do
-    local taCurrSummary = taRunners[i]:getSummaryTable()
+    local taCurrSummary = self.taRunners[i]:getSummaryTable()
+    table.insert(taAggrSummary, taCurrSummary)
   end
 
   return taAggrSummary

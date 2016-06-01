@@ -153,7 +153,8 @@ do
     local errCurr = math.huge
 
     for i=1, taTrainParam.maxIteration do
-      errCurr = trainerPool.pri_trainGrnn3d_SingleRound(mNetAdapter:getRaw(), teInput, teTarget, taTrainParam)
+      local mNetRaw = mNetAdapter:getRaw()
+      errCurr = trainerPool.pri_trainGrnn3d_SingleRound(mNetRaw, teInput, teTarget, taTrainParam)
 
       if errPrev <= errCurr or myUtil.isNan(errCurr)  then
         print("** early stop **")

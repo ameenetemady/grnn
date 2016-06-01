@@ -1,5 +1,5 @@
 local testerPool = testerPool or require('../../../MyCommon/testerPool.lua')
-local grnnArchFactory = grnnArchFactory or require('../../grnnArchFactory.lua')
+--local grnnArchFactory = grnnArchFactory or require('../../grnnArchFactory.lua')
 local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')
 local lSettings = lSettings or require('./lSettings.lua')
 local lDataLoad = lDataLoad or require('./lDataLoad.lua')

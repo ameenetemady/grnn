@@ -16,7 +16,7 @@ end
 
 function FoldRun:Run()
   local dBestTrainErr = math.huge
-  local mNetAdapterBest = nil
+  local mNetAdapterBest = self.mNetAdapter:clone()
 
   -- train (with all seeds)
   for i=1, self.nSeeds do
@@ -25,7 +25,9 @@ function FoldRun:Run()
     local teInput_train = self.taTrain[1]
     local teTarget_train = self.taTrain[2]
 
-    local dTrainErr = self.fuTrainer(self.mNetAdapter, teInput_train, teTarget_train)
+    print("i: " .. i)
+    local dTrainErr = math.huge
+    dTrainErr, self.mNetAdapter = self.fuTrainer(self.mNetAdapter:cloneNoWeight(), teInput_train, teTarget_train)
 
     if dTrainErr < dBestTrainErr then
       dBestTrainErr = dTrainErr

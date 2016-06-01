@@ -1,4 +1,8 @@
-local MNetAdapter9s = torch.class("MNetAdapter9s")
+local syngTwoAuto = syngTwoAuto or require('../../SyngTwoAuto.lua')
+local syngOneAutoSimple = syngOneAutoSimple or require('../../SyngOneAutoSimple.lua')
+local grnnArchUnits = grnnArchUnits or require('../../grnnArchUnits.lua')
+
+local MNetAdapter9s = MNetAdapter9s or torch.class("MNetAdapter9s")
 
 function MNetAdapter9s:__init(taParam, taWeights)
   --[[
@@ -18,6 +22,10 @@ function MNetAdapter9s.pri_cloneParams(taParam)
 end
 
 function MNetAdapter9s.pri_cloneWeights(taWeights)
+  if taWeights == nil then
+    return nil
+  end
+
   local taWeightsClone = {}
   for k, v in pairs(taWeights) do
     taWeightsClone[k] = v:clone()
@@ -40,12 +48,16 @@ function MNetAdapter9s:clone()
   return MNetAdapter9s.new(self.taParam, taWeights)
 end
 
+function MNetAdapter9s:cloneNoWeight()
+  return MNetAdapter9s.new(self.taParam)
+end
+
 function MNetAdapter9s:getRaw()
   return self.mNet
 end
 
 
-function MNetAdapter9s:pri_get_ConcatAbove(mUnit)
+function MNetAdapter9s.pri_get_ConcatAbove(mUnit)
   local mRes = nn.Concat(2)
   mRes:add(mUnit)
   mRes:add(nn.Identity())
@@ -70,13 +82,13 @@ function MNetAdapter9s.getNewMNet(taWeights)
     local mG5 = grnnArchUnits.aGx(1, fuS1, 5, nNonTFs, 2, taWeights.g5) --(nfArgs, fu, nGid, nNonTFs, nTFid)
   mSeqBranch1:add(mG5)
     local mG6 = grnnArchUnits.aGx(1, fuS1, 6, nNonTFs, 1, taWeights.g6) --(nfArgs, fu, nGid, nNonTFs, nTFid)
-    local mConH6 = archFactory.pri_get_ConcatAbove(mG6) --d2: 5,6
+    local mConH6 = MNetAdapter9s.pri_get_ConcatAbove(mG6) --d2: 5,6
   mSeqBranch1:add(mConH6)
     local mG9 = grnnArchUnits.aGx(1, fuS1, 7, nNonTFs, 1, taWeights.g9) --(nfArgs, fu, nGid, nNonTFs, nTFid)
-    local mConH9 = archFactory.pri_get_ConcatAbove(mG9) --d2: 9,5,6
+    local mConH9 = MNetAdapter9s.pri_get_ConcatAbove(mG9) --d2: 9,5,6
   mSeqBranch1:add(mConH9)
     local mG1 = grnnArchUnits.aGx(1, fuS1, 1, nNonTFs, 1, taWeights.g1) --(nfArgs, fu, nGid, nNonTFs, nTFid)
-    local mConH1 = archFactory.pri_get_ConcatAbove(mG1) --d2: 1,9,5,6
+    local mConH1 = MNetAdapter9s.pri_get_ConcatAbove(mG1) --d2: 1,9,5,6
   mSeqBranch1:add(mConH1) -- d2: 1, 9, 5, 6
 
   -- 5 -> 6 -> 9 -> 1* -> 2
