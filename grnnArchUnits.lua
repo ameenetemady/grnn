@@ -1,9 +1,3 @@
-require 'nn'
-require('./torchNew/Squeeze.lua')
-require('./torchNew/Unsqueeze.lua')
-require('./CMulNoParamBatch.lua')
-require('./ClonableUnit.lua')
-
 local grnnArchUnits = {}
 
 do
@@ -41,8 +35,10 @@ do
   end
 
   function grnnArchUnits.bSeqGx_clonable(nfArgs, fu, nGid, teWeight)
+
     local fuUnitFactory = function(teWeightNew)
-      return grnnArchUnits.bSeqGx(nfArgs, fu, nGid, teWeightNew) 
+      local mUnit = grnnArchUnits.bSeqGx(nfArgs, fu, nGid, teWeightNew) 
+      return mUnit
     end
 
     return ClonableUnit.new(fuUnitFactory, teWeight)

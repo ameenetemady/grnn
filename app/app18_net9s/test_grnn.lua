@@ -1,4 +1,5 @@
 torch.manualSeed(0)
+require('../../requireBaseUnits.lua')
 
 local grnnArchFactory = grnnArchFactory or require('../../grnnArchFactory.lua')
 local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')

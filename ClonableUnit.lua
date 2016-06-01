@@ -4,10 +4,10 @@ function ClonableUnit:__init(fuUnitFactory, teWeight)
   self.fuUnitFactory = fuUnitFactory
   self.teWeight = teWeight
   self.mUnit = self.fuUnitFactory(teWeight)
-end
+ end
 
 function ClonableUnit:clone()
-  return ClonableUnit.new(self.fuUnitFactory, self.teWeight:clone())
+  return ClonableUnit.new(self.fuUnitFactory, self.teWeight)
 end
 
 function ClonableUnit:getRaw()
