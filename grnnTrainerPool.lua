@@ -10,7 +10,7 @@ do
     local taTrainParam = {  --batchSize = 9, 
                             batchSize = math.floor(nRows),
                             criterion = nn.MSECriterion(),
-                            maxIteration = 1000,
+                            maxIteration = 100,
                             coefL1 = 0.0,
                             coefL2 = 0.0,
                             strOptimMethod = strOptimMethod or "CG",

@@ -4,86 +4,26 @@ local syngTwoAutoSimple = syngTwoAutoSimple or require('../../SyngTwoAutoSimple.
 local syngOneAutoSimple = syngOneAutoSimple or require('../../SyngOneAutoSimple.lua')
 local grnnArchUnits = grnnArchUnits or require('../../grnnArchUnits.lua')
 
-local MNetAdapter9s = MNetAdapter9s or torch.class("MNetAdapter9s")
+local MNetAdapter9s, parent = MNetAdapter9s or torch.class("MNetAdapter9s", "AMNetAdapter")
 
 function MNetAdapter9s:__init(taParam, taWeights)
-  --[[
-  self.taTFNames =  taParam.taTFNames  
-  self.taKONames = taParam.taKONames
-  self.taTargetNames = taParam.taTargetNames
-  --]]
-
-  self.taParam = MNetAdapter9s.pri_cloneParams(taParam)
-  self.taWeights = MNetAdapter9s.pri_cloneWeights(taWeights)
-
-  self.mNet, self.taFu = MNetAdapter9s.getNewMNet(self.taWeights)
-end
-
---just for testing:
-function MNetAdapter9s:test_addToWeights(dAdd)
-  local taWeights = self:pri_getModelWeights()
-
-  local taWeightsNew = {}
-  for k, v in pairs(taWeights) do
-    taWeightsNew[k] = torch.add(v:clone(), dAdd)
-  end
-
-  self.mNet, self.taFu = MNetAdapter9s.getNewMNet(taWeightsNew)
-end
-
-function MNetAdapter9s:pri_getModelWeights()
-  local taWeights = {}
-  for k, v in pairs(self.taFu) do
-    taWeights[k] = v.mGx:parameters()[1]
-  end
-
-  return taWeights
+  self.taParam = self.pri_cloneParams(taParam)
+  self.taWeights = self.pri_cloneWeights(taWeights)
+  self.mNet, self.taFu = self.getNewMNet(self.taWeights)
 end
 
 function MNetAdapter9s:clone()
   local taWeights = self:pri_getModelWeights()
-  return MNetAdapter9s.new(self.taParam, taWeights)
-end
-
-function MNetAdapter9s:reload()
-  self.mNet, self.taFu = MNetAdapter9s.getNewMNet(self.taWeights)
-end
-
-function MNetAdapter9s:setWeight(strGene, teWeight)
-  if self.taWeights == nil then
-    self.taWeights = {}
-  end
-
-  self.taWeights[strGene] = teWeight
+  return self.new(self.taParam, taWeights)
 end
 
 function MNetAdapter9s:cloneNoWeight()
-  return MNetAdapter9s.new(self.taParam)
+  return self.new(self.taParam)
 end
 
-function MNetAdapter9s:getRaw()
-  return self.mNet
-end
-
--- Static Methods:
-function MNetAdapter9s.pri_cloneParams(taParam)
-  return taParam
-end
-
-function MNetAdapter9s.pri_cloneWeights(taWeights)
-  if taWeights == nil then
-    return nil
-  end
-
-  local taWeightsClone = {}
-  for k, v in pairs(taWeights) do
-    taWeightsClone[k] = v:clone()
-  end
-
-  return taWeightsClone
-end
-
-
+-- ***************************
+-- ****** Static Methods *****
+-- ***************************
 function MNetAdapter9s.pri_get_ConcatAbove(mUnit)
   local mRes = nn.Concat(2)
   mRes:add(mUnit)

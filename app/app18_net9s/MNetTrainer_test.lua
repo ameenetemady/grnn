@@ -71,7 +71,7 @@ end
 
 function MNetTrainer_test.trainEachUnit_test1()
 
-  local exprSettings = lSettings.getExprSetting("d_1")
+  local exprSettings = lSettings.getExprSetting("d_2")
   local teInput, taTFNames, taKONames = lDataLoad.load3dInput(exprSettings)
   local teTarget, taTargetNames = lDataLoad.loadTarget(exprSettings)
 
