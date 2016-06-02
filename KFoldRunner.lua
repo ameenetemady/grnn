@@ -1,14 +1,15 @@
 local KFoldRunner = torch.class("KFoldRunner")
 
-function KFoldRunner:__init(taParam)
+function KFoldRunner:__init(taParam, fuFoldRunFactory)
   self.nFolds = taParam.nFolds
   self.nSeeds = taParam.nSeeds
   self.teInput = taParam.teInput
   self.teTarget = taParam.teTarget
---  self.fuArchGen = taParam.fuArchGen
   self.mNetAdapter = taParam.mNetAdapter
   self.fuTrainer = taParam.fuTrainer
   self.fuTester = taParam.fuTester
+
+  self.fuFoldRunFactory = fuFoldRunFactory
 
   self.nNextFoldId = 1
   self.taRunners = {}
@@ -64,6 +65,14 @@ function KFoldRunner:pri_getFold(teInput, nFoldId)
   return teTrain, teTest
 end
 
+function KFoldRunner:pri_getNewFoldRun(taRunParam)
+  if fuFoldRunFactory == nil then
+    return FoldRun.new(taRunParam)
+  end
+
+  return fuFoldRunFactory(taRunParam)
+end
+
 function KFoldRunner:getNext()
   if not self:hasMore() then
     return nil
@@ -76,13 +85,12 @@ function KFoldRunner:getNext()
     taTrain = { teInput_train, teTarget_train },
     taTest = { teInput_test, teTarget_test },
     nSeeds = self.nSeeds,
-    --fuArchGen = self.fuArchGen,
     mNetAdapter = self.mNetAdapter,
     fuTrainer = self.fuTrainer,
     fuTester = self.fuTester
   }
 
-  local foldRun = FoldRun.new(taRunParam)
+  local foldRun = self:pri_getNewFoldRun(taRunParam)
   table.insert(self.taRunners, foldRun)
 
   self.nNextFoldId = self.nNextFoldId + 1

@@ -11,8 +11,8 @@ local exprSettings = lSettings.getExprSetting("d_1")
 -- load:
 --local taTFs = lDataLoad.getData(exprSettings.strTFsNoNoiseFilePath)
 --local taNonTF = lDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
-local taTFs = lDataLoad.getData(exprSettings.strTFsFilePath)
-local taNonTF = lDataLoad.getData(exprSettings.strNonTFsFilePath)
+local taTFs = lDataLoad.getData(exprSettings.strTFsNoNoiseFilePath)
+local taNonTF = lDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
 local taKOs = lDataLoad.getData(exprSettings.strKOsFilePath)
 
 -- Prepare

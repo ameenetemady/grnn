@@ -5,7 +5,6 @@ function FoldRun:__init(taParam)
     self.taTrain = taParam.taTrain
     self.taTest = taParam.taTest
     self.nSeeds = taParam.nSeeds
---    self.fuArchGen = taParam.fuArchGen
     self.mNetAdapter = taParam.mNetAdapter
     self.fuTrainer = taParam.fuTrainer
     self.fuTester = taParam.fuTester

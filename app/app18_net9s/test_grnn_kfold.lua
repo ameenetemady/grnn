@@ -15,11 +15,10 @@ local teTarget, taTargetNames = lDataLoad.loadTarget(exprSettings)
 local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 
 local taParam = { 
-  nFolds = 2, 
+  nFolds = 5, 
   nSeeds = 1,
   teInput = teInput, 
   teTarget = teTarget, 
---  fuArchGen = grnnArchFactory.net9s,
   mNetAdapter = MNetAdapter9s.new(taNetParam),
   fuTrainer = trainerPool.trainGrnn3dMNetAdapter,
   fuTester = testerPool.getMSE}
