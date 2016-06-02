@@ -42,7 +42,7 @@ function MNetTrainer_test.trainUnit_test1()
 
   local exprSettings = lSettings.getExprSetting("d_1_small")
   local teInput, taTFNames, taKONames = lDataLoad.load3dInput(exprSettings)
-  teTarget, taTargetNames = lDataLoad.loadTarget(exprSettings)
+  local teTarget, taTargetNames = lDataLoad.loadTarget(exprSettings)
 
   local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 
@@ -51,16 +51,14 @@ function MNetTrainer_test.trainUnit_test1()
   local fuTester = testerPool.getMSE
 
   local mNet = mNetAdapter:getRaw()
-  local teTarget = mNet:forward(teInput)
-  mNetAdapter:test_addToWeights(0.1)
-
 
   local dTestErr = fuTester(mNetAdapter:getRaw(), teInput, teTarget)
   print("Before MSE error", dTestErr)
 
   local taMNetTrainerParam = { teInput = teInput,
                                teTarget = teTarget,
-                               fuTrainer = fuTrainer
+                               fuTrainer = fuTrainer,
+                               fuTester = fuTester
                              }
 
   local mNetTrainer = MNetTrainer.new(taMNetTrainerParam, mNetAdapter)
@@ -90,11 +88,12 @@ function MNetTrainer_test.trainEachUnit_test1()
 
   local taMNetTrainerParam = { teInput = teInput,
                                teTarget = teTarget,
-                               fuTrainer = fuTrainer
+                               fuTrainer = fuTrainer,
+                               fuTester = fuTester
                              }
 
   local mNetTrainer = MNetTrainer.new(taMNetTrainerParam, mNetAdapter)
-  mNetTrainer:trainEachUnit("G3")
+  mNetTrainer:trainEachUnit()
   mNetAdapter:reload()
 
   dTestErr = fuTester(mNetAdapter:getRaw(), teInput, teTarget)

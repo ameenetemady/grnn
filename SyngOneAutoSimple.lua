@@ -4,15 +4,16 @@ local SyngOneAutoSimple = {}
 do
   local fuAutoSyngOneFull = function(input, weight, bias)
 
-      local a0 = weight[1]
-      local a1 = weight[2]
-      local b =  weight[3]
-      local c =  weight[4]
+      local a = weight[1]
+      local b = weight[2]
+      local c =  weight[3]
+      local d =  weight[4]
 
-      local y = torch.exp(torch.add(torch.mul(input, b), c))
-      local value = torch.add(torch.mul(y, a1), a0)
+      local y = torch.exp(torch.add(torch.mul(input, -b), b*c))
+      local but = torch.add(y, 1)
+      local output = torch.add(torch.mul(torch.pow(but, -1), a), d)
 
-    return value 
+    return output
   end
 
   function  SyngOneAutoSimple.new(weight)

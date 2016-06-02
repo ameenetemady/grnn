@@ -167,13 +167,13 @@ function MNetAdapter9s.getNewMNet(taWeights)
   mFinalSeq:add(mReOrder)
 
 
-  local taFu = { G5 = { fu = fuS1, mGx = mG5, taIn={"G7"}},
-                 G6 = { fu = fuS1, mGx = mG6, taIn={"G5"}},
-                 G9 = { fu = fuS1, mGx = mG9, taIn={"G6"}},
-                 G1 = { fu = fuS1, mGx = mG1, taIn={"G9"}},
-                 G3 = { fu = fuS1, mGx = mG3, taIn={"G10"}},
-                 G4 = { fu = fuS2, mGx = mG4, taIn={"G7", "G3"}},
-                 G2 = { fu = fuS2, mGx = mG2, taIn={"G1", "G4"}}
+  local taFu = { G5 = { fu = fuS1, fuInit = fuInitS1, mGx = mG5, taIn={"G7"}},
+                 G6 = { fu = fuS1, fuInit = fuInitS1, mGx = mG6, taIn={"G5"}},
+                 G9 = { fu = fuS1, fuInit = fuInitS1, mGx = mG9, taIn={"G6"}},
+                 G1 = { fu = fuS1, fuInit = fuInitS1, mGx = mG1, taIn={"G9"}},
+                 G3 = { fu = fuS1, fuInit = fuInitS1, mGx = mG3, taIn={"G10"}},
+                 G4 = { fu = fuS2, fuInit = fuInitS2, mGx = mG4, taIn={"G7", "G3"}},
+                 G2 = { fu = fuS2, fuInit = fuInitS2, mGx = mG2, taIn={"G1", "G4"}}
                 }
 
   return mFinalSeq, taFu

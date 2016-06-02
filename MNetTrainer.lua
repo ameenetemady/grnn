@@ -25,6 +25,10 @@ function MNetTrainer:pri_getGeneSlice(strGene)
   return self.taParam.teInput:narrow(2, nGid, 1):select(3, 1)
 end
 
+function MNetTrainer:pri_getKOSlice()
+  return self.taParam.teInput:narrow(3, 2, self.nTargets):narrow(2, 1, 1)
+end
+
 function MNetTrainer:trainUnit(strGene)
   local taGeneInfo = self.mNetAdapter.taFu[strGene]
   local nIns = table.getn(taGeneInfo.taIn)
@@ -36,6 +40,10 @@ function MNetTrainer:trainUnit(strGene)
     local strCurrGene = taGeneInfo.taIn[i]
     local teSlice = self:pri_getGeneSlice(strCurrGene)
     teUnitInput:narrow(2, i, 1):select(3, 1):copy(teSlice)
+
+    local teKOSlice = self:pri_getKOSlice()
+    teUnitInput:narrow(2, i, 1):narrow(3, 2, self.nTargets):copy(teKOSlice)
+    
   end
 
   -- Create target
@@ -48,7 +56,8 @@ function MNetTrainer:trainUnit(strGene)
   -- Train
   local dTrainErr
   dTrainErr, mGxTrained = self.taParam.fuTrainer(mGxClonable, teUnitInput, teUnitTarget)
-  print(string.format("trainUnit: train error for %s: %d", strGene, dTrainErr))
+  local dTestErr = self.taParam.fuTester(mGxClonable:getRaw(), teUnitInput, teUnitTarget)
+  print(string.format("trainUnit: error for %s: %f", strGene, dTestErr))
 
   -- Set Weight
   self.mNetAdapter:setWeight(strGene, mGxTrained:getRaw():parameters()[1])
