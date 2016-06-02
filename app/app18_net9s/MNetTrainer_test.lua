@@ -98,7 +98,8 @@ function MNetTrainer_test.trainEachUnit_test1()
   dTestErr = fuTester(mNetAdapter:getRaw(), teInput, teTarget)
   print("MSE error:trainEachUnit", dTestErr)
 
-  mNetTrainer:trainTogether()
+  local dTrainErr
+  dTrainErr, mNetAdapter = mNetTrainer:trainTogether()
   dTestErr = fuTester(mNetAdapter:getRaw(), teInput, teTarget)
   print("MSE error:trainTogether", dTestErr)
 

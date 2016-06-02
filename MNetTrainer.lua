@@ -80,6 +80,8 @@ function MNetTrainer:trainEachUnit()
 end
 
 function MNetTrainer:trainTogether()
-  -- todo: implement ...
+    local dTrainErr
+    dTrainErr, self.mNetAdapter = self.taParam.fuTrainer(self.mNetAdapter:clone(), self.taParam.teInput, self.taParam.teTarget)
+    return dTrainErr, self.mNetAdapter
 end
 
