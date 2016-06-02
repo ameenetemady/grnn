@@ -51,7 +51,8 @@ function MNetTrainer:trainUnit(strGene)
 
  -- Create unit to train
   local nGid = myUtil.findIndexInArray(self.mNetAdapter.taParam.taTargetNames, strGene) -- this is to specify which gene is knocked out
-  local mGxClonable = grnnArchUnits.bSeqGx_clonable(nIns, taGeneInfo.fu, nGid, nil) -- the last argument is nil for random initialization
+  local mGxClonable = grnnArchUnits.bSeqGx_clonable(nIns, taGeneInfo.fu, nGid, 
+                                                    self:pri_getInitWeights(teUnitInput, teUnitTarget, taGeneInfo.fuInit, nGid)) 
  
   -- Train
   local dTrainErr
@@ -61,6 +62,13 @@ function MNetTrainer:trainUnit(strGene)
 
   -- Set Weight
   self.mNetAdapter:setWeight(strGene, mGxTrained:getRaw():parameters()[1])
+end
+
+function MNetTrainer:pri_getInitWeights(teUnitInput, teUnitTarget, fuInit, nGid)
+  local teUnitInputSlice = teUnitInput:select(3, 1, 1)
+  local teUnitKOSlice = teUnitInput:narrow(3, 1 + nGid, 1):select(3, 1)
+  
+  return fuInit(teUnitInputSlice, teUnitTarget, teUnitKOSlice)
 end
 
 function MNetTrainer:trainEachUnit()

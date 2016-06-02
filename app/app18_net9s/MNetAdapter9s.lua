@@ -102,6 +102,14 @@ function MNetAdapter9s.getNewMNet(taWeights)
     return syngTwoAuto.new(weight)
   end
 
+  local fuInitS1 = function(teInputSlice, teTargetSclice, teKOSlice)
+    return syngOneAutoSimple.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
+  end
+
+  local fuInitS2 = function(teInputSlice, teTargetSclice, teKOSlice)
+    return syngTwoAuto.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
+  end
+
 
   local nNonTFs = 7
 

@@ -30,5 +30,10 @@ do
     return autograd.nn.AutoModule('AutoSyngTwoFull')(fuAutoSyngTwoFull, weight:clone())
   end
 
+  function SyngTwoAuto.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
+    return torch.rand(9)*2-1 -- todo: do better than this!
+  end 
+
+
   return SyngTwoAuto
 end
