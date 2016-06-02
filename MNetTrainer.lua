@@ -66,7 +66,7 @@ end
 
 function MNetTrainer:pri_getInitWeights(teUnitInput, teUnitTarget, fuInit, nGid)
   local teUnitInputSlice = teUnitInput:select(3, 1, 1)
-  local teUnitKOSlice = teUnitInput:narrow(3, 1 + nGid, 1):select(3, 1)
+  local teUnitKOSlice = teUnitInput:narrow(2, 1, 1):narrow(3, 1 + nGid, 1):select(3, 1)
   
   return fuInit(teUnitInputSlice, teUnitTarget, teUnitKOSlice)
 end
@@ -76,5 +76,10 @@ function MNetTrainer:trainEachUnit()
     self:trainUnit(strGene)
   end
 
-  return self.mNetAdapter:clone()
+  self.mNetAdapter:reload()
 end
+
+function MNetTrainer:trainTogether()
+  -- todo: implement ...
+end
+

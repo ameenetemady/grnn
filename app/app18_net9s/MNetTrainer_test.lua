@@ -84,7 +84,7 @@ function MNetTrainer_test.trainEachUnit_test1()
   local mNet = mNetAdapter:getRaw()
 
   local dTestErr = fuTester(mNetAdapter:getRaw(), teInput, teTarget)
-  print("Before MSE error", dTestErr)
+  print("MSE error:Initial", dTestErr)
 
   local taMNetTrainerParam = { teInput = teInput,
                                teTarget = teTarget,
@@ -94,10 +94,14 @@ function MNetTrainer_test.trainEachUnit_test1()
 
   local mNetTrainer = MNetTrainer.new(taMNetTrainerParam, mNetAdapter)
   mNetTrainer:trainEachUnit()
-  mNetAdapter:reload()
 
   dTestErr = fuTester(mNetAdapter:getRaw(), teInput, teTarget)
-  print("After MSE error", dTestErr)
+  print("MSE error:trainEachUnit", dTestErr)
+
+  mNetTrainer:trainTogether()
+  dTestErr = fuTester(mNetAdapter:getRaw(), teInput, teTarget)
+  print("MSE error:trainTogether", dTestErr)
+
 end
 
 

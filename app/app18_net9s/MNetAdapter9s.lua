@@ -1,6 +1,6 @@
 require('../../requireBaseUnits.lua')
 
-local syngTwoAuto = syngTwoAuto or require('../../SyngTwoAuto.lua')
+local syngTwoAutoSimple = syngTwoAutoSimple or require('../../SyngTwoAutoSimple.lua')
 local syngOneAutoSimple = syngOneAutoSimple or require('../../SyngOneAutoSimple.lua')
 local grnnArchUnits = grnnArchUnits or require('../../grnnArchUnits.lua')
 
@@ -99,7 +99,7 @@ function MNetAdapter9s.getNewMNet(taWeights)
   end
 
   local fuS2 = function(weight)
-    return syngTwoAuto.new(weight)
+    return syngTwoAutoSimple.new(weight)
   end
 
   local fuInitS1 = function(teInputSlice, teTargetSclice, teKOSlice)
@@ -107,7 +107,7 @@ function MNetAdapter9s.getNewMNet(taWeights)
   end
 
   local fuInitS2 = function(teInputSlice, teTargetSclice, teKOSlice)
-    return syngTwoAuto.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
+    return syngTwoAutoSimple.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
   end
 
 
