@@ -51,6 +51,7 @@ function MNetTrainer:trainUnit(strGene)
 
  -- Create unit to train
   local nGid = myUtil.findIndexInArray(self.mNetAdapter.taParam.taTargetNames, strGene) -- this is to specify which gene is knocked out
+  assert(type(nGid) == "number" and nGid > 0, string.format("unExpected nGid:%d !", nGid))
   local mGxClonable = grnnArchUnits.bSeqGx_clonable(nIns, taGeneInfo.fu, nGid, 
                                                     self:pri_getInitWeights(teUnitInput, teUnitTarget, taGeneInfo.fuInit, nGid)) 
  

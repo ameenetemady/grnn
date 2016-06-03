@@ -37,6 +37,10 @@ do
   end
 
   function SyngOneAutoSimple.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
+    if teKOSlice:sum() < 1 then
+      return torch.zeros(4)
+    end
+
     local isActivator = SyngOneAutoSimple.pri_isActivator(teInputSlice, teTargetSclice, teKOSlice)
     local a = torch.max(teTargetSclice)
     local b = isActivator and 2 or -2

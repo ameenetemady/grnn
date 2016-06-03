@@ -1,4 +1,4 @@
-require("../../MNetTrainer.lua")
+require("./MNetTrainer.lua")
 
 local FoldRunMNetTrainer = torch.class("FoldRunMNetTrainer", "FoldRun")
 
