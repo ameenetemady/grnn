@@ -57,7 +57,7 @@ function MNetTrainer:trainUnit(strGene)
  
   -- Train
   local dTrainErr
-  dTrainErr, mGxTrained = self.taParam.fuTrainer(mGxClonable, teUnitInput, teUnitTarget)
+  dTrainErr, mGxTrained = self.taParam.fuTrainer(mGxClonable, teUnitInput, teUnitTarget, self.taParam.taFuTrainerParams)
   local dTestErr = self.taParam.fuTester(mGxClonable:getRaw(), teUnitInput, teUnitTarget)
   print(string.format("trainUnit: error for %s: %f", strGene, dTestErr))
 
@@ -82,7 +82,7 @@ end
 
 function MNetTrainer:trainTogether()
     local dTrainErr
-    dTrainErr, self.mNetAdapter = self.taParam.fuTrainer(self.mNetAdapter:clone(), self.taParam.teInput, self.taParam.teTarget)
+    dTrainErr, self.mNetAdapter = self.taParam.fuTrainer(self.mNetAdapter:clone(), self.taParam.teInput, self.taParam.teTarget, self.taParam.taFuTrainerParams)
     return dTrainErr, self.mNetAdapter
 end
 

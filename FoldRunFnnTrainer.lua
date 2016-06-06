@@ -7,6 +7,7 @@ function FoldRunFnnTrainer :__init(taParam)
     self.taTest = taParam.taTest
     self.mNetAdapter = taParam.mNetAdapter
     self.fuTrainer = taParam.fuTrainer
+    self.taFuTrainerParams = taParam.taFuTrainerParams
     self.fuTester = taParam.fuTester
     self.nSeeds = taParam.nSeeds
 
@@ -20,6 +21,7 @@ function FoldRunFnnTrainer:Run()
   local taMNetTrainerParam = { teInput = self.taTrain[1],
                                teTarget = self.taTrain[2],
                                fuTrainer = self.fuTrainer,
+                               taFuTrainerParams = self.taFuTrainerParams,
                                fuTester = self.fuTester
                              }
   local dBestTrainErr = math.huge

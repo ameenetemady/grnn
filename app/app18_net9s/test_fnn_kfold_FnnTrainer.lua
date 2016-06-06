@@ -2,6 +2,7 @@ local testerPool = testerPool or require('../../../MyCommon/testerPool.lua')
 local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')
 local lSettings = lSettings or require('./lSettings.lua')
 local lDataLoad = lDataLoad or require('./lDataLoad.lua')
+local myUtil = myUtil or require('../../../MyCommon/util.lua')
 require('../../FoldRun.lua')
 require('../../FoldRunFnnTrainer.lua')
 require('../../KFoldRunner.lua')
@@ -25,12 +26,13 @@ function runExperiment(strExprName, isNoise, taFnnParam)
   end
 
   local taParam = { 
-    nFolds = 3, 
-    nSeeds = 5,
+    nFolds = 5, 
+    nSeeds = 1, --10
     teInput = teInput, 
     teTarget = teTarget, 
     mNetAdapter = FnnAdapter.new(taArchParam),
     fuTrainer = trainerPool.trainGrnnMNetAdapter,
+    taFuTrainerParams = { nMaxIteration = 2}, --200
     fuTester = testerPool.getMSE }
 
     local kFoldRunner = KFoldRunner.new(taParam, fuFoldRunFactory)
@@ -43,16 +45,26 @@ function runExperiment(strExprName, isNoise, taFnnParam)
   return kFoldRunner:getAggrSummaryTable()
 end
 
-local isNoise = false
+function getResultFilename(taFnnParam, strExprName, isNoise)
+  local strNoise = isNoise and "_noise" or ""
+  return string.format("result/fnn_nh%d_nnpl%d_%s%s.table", 
+                                          taFnnParam.nHiddenLayers, taFnnParam.nNodesPerLayer, strExprName, strNoise)
+
+end
+
+local isNoise = myUtil.getBoolFromStr(arg[1])
+
 local taFnnParam = { nNodesPerLayer = 4, nHiddenLayers = 0 }
-local nMaxExprId = 20
+local nMaxExprId = 10
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))
 
   local taExprResult = runExperiment(strExprName, isNoise, taFnnParam)
-  local strResultFilename = string.format("result/fnn_nh0_nnpl4_%s.table", 
-                                          taFnnParam.nHiddenLayers, taFnnParam.nNodesPerLayer, strExprName)
+--  local strResultFilename = string.format("result/fnn_nh%d_nnpl%d_%s.table", 
+--                                          taFnnParam.nHiddenLayers, taFnnParam.nNodesPerLayer, strExprName)
+  local strResultFilename = getResultFilename(taFnnParam, strExprName, isNoise)
+
   torch.save(strResultFilename, taExprResult, "ascii")
 end
 
