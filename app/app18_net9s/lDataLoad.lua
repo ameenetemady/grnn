@@ -3,6 +3,8 @@ local lDataLoad = {}
 
 do
   function lDataLoad.getData(strFilePath)
+    print(strFilePath)
+
     local taGenes = dataLoad.getHeader(strFilePath)
     local taLoadParam = { strFilename = strFilePath, nCols = table.getn(taGenes), taCols = taGenes, isHeader = true }
     local teData = dataLoad.loadTensorFromTsv(taLoadParam)
@@ -27,9 +29,25 @@ do
     return teInput, taTFs.taGenes, taKOs.taGenes
   end
 
-  function lDataLoad.loadTarget(exprSettings)
+  function lDataLoad.load2dInput(exprSettings, isNoise)
+    isNoise = isNoise or false
 
-    local taNonTF = lDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
+    local strTFFilepath = isNoise and exprSettings.strTFsFilePath or exprSettings.strTFsNoNoiseFilePath
+    local strKOFilepath = exprSettings.strKOsFilePath
+
+    local taTF = lDataLoad.getData(strTFFilepath)
+    local taKO = lDataLoad.getData(strKOFilepath)
+
+    local teInput = torch.cat(taTF.teData, taKO.teData, 2)
+
+    return teInput, taTF, taKO
+  end
+
+  function lDataLoad.loadTarget(exprSettings, isNoise)
+    isNoise = isNoise or false
+
+    local strNonTFFilepath = isNoise and exprSettings.strNonTFsFilePath or exprSettings.strNonTFsNoNoiseFilePath
+    local taNonTF = lDataLoad.getData(strNonTFFilepath)
 
     return taNonTF.teData, taNonTF.taGenes
   end

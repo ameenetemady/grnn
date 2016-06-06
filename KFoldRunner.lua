@@ -66,11 +66,11 @@ function KFoldRunner:pri_getFold(teInput, nFoldId)
 end
 
 function KFoldRunner:pri_getNewFoldRun(taRunParam)
-  if fuFoldRunFactory == nil then
+  if self.fuFoldRunFactory == nil then
     return FoldRun.new(taRunParam)
   end
 
-  return fuFoldRunFactory(taRunParam)
+  return self.fuFoldRunFactory(taRunParam)
 end
 
 function KFoldRunner:getNext()

@@ -21,7 +21,7 @@ function MNetTrainer_test.pri_getGeneSlice_test1()
   local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 
   local mNetAdapter = MNetAdapter9s.new(taNetParam)
-  local fuTrainer = trainerPool.trainGrnn3dMNetAdapter
+  local fuTrainer = trainerPool.trainGrnnMNetAdapter
   local fuTester = testerPool.getMSE
 
   local mNet = mNetAdapter:getRaw()
@@ -47,7 +47,7 @@ function MNetTrainer_test.trainUnit_test1()
   local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 
   local mNetAdapter = MNetAdapter9s.new(taNetParam)
-  local fuTrainer = trainerPool.trainGrnn3dMNetAdapter
+  local fuTrainer = trainerPool.trainGrnnMNetAdapter
   local fuTester = testerPool.getMSE
 
   local mNet = mNetAdapter:getRaw()
@@ -78,7 +78,7 @@ function MNetTrainer_test.trainEachUnit_test1()
   local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 
   local mNetAdapter = MNetAdapter9s.new(taNetParam)
-  local fuTrainer = trainerPool.trainGrnn3dMNetAdapter
+  local fuTrainer = trainerPool.trainGrnnMNetAdapter
   local fuTester = testerPool.getMSE
 
   local mNet = mNetAdapter:getRaw()

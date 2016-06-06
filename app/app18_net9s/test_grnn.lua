@@ -38,7 +38,7 @@ local nMaxIter = 5
 for seed=1, nMaxIter do
   torch.manualSeed(seed)
   mNet9s = grnnArchFactory.net9s()
-  local f = trainerPool.trainGrnn3d(mNet9s, teInput, teTarget)
+  local f = trainerPool.trainGrnn(mNet9s, teInput, teTarget)
   print("MSE:" .. f .. ", seed: " .. seed)
 
   if f < fBest then

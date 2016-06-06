@@ -19,11 +19,11 @@ function runExperiment(strExprName)
   end
 
   local taParam = { 
-    nFolds = 10, 
+    nFolds = 3, 
     teInput = teInput, 
     teTarget = teTarget, 
     mNetAdapter = MNetAdapter9s.new(taNetParam),
-    fuTrainer = trainerPool.trainGrnn3dMNetAdapter,
+    fuTrainer = trainerPool.trainGrnnMNetAdapter,
     fuTester = testerPool.getMSE}
 
     local kFoldRunner = KFoldRunner.new(taParam, fuFoldRunFactory)
@@ -36,7 +36,7 @@ function runExperiment(strExprName)
   return kFoldRunner:getAggrSummaryTable()
 end
 
-local nMaxExprId = 20
+local nMaxExprId = 3 
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))

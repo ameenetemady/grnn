@@ -10,7 +10,7 @@ do
     local taTrainParam = {  --batchSize = 9, 
                             batchSize = math.floor(nRows),
                             criterion = nn.MSECriterion(),
-                            maxIteration = 500,
+                            maxIteration = 10,
                             coefL1 = 0.0,
                             coefL2 = 0.0,
                             strOptimMethod = strOptimMethod or "CG",
@@ -40,7 +40,7 @@ do
     return taTrainParam
   end
 
-  function trainerPool.pri_trainGrnn3d_SingleRound(mNet, teInput, teTarget, taTrainParam)
+  function trainerPool.pri_trainGrnn_SingleRound(mNet, teInput, teTarget, taTrainParam)
     parameters, gradParameters = mNet:getParameters()
     local criterion = taTrainParam.criterion
     local overallErr = 0
@@ -118,7 +118,7 @@ do
 
   end
 
-  function trainerPool.trainGrnn3d(mNet, teInput, teTarget)
+  function trainerPool.trainGrnn(mNet, teInput, teTarget)
     local criterion = nn.MSECriterion()
     local taTrainParam = trainerPool.getDefaultTrainParams(teInput:size(1),"CG" )
 
@@ -126,7 +126,7 @@ do
     local errCurr = math.huge
 
     for i=1, taTrainParam.maxIteration do
-      errCurr = trainerPool.pri_trainGrnn3d_SingleRound(mNet, teInput, teTarget, taTrainParam)
+      errCurr = trainerPool.pri_trainGrnn_SingleRound(mNet, teInput, teTarget, taTrainParam)
 
       if errPrev <= errCurr or myUtil.isNan(errCurr)  then
         print("** early stop **")
@@ -144,7 +144,7 @@ do
     return errCurr
   end
 
-  function trainerPool.trainGrnn3dMNetAdapter(mNetAdapter, teInput, teTarget)
+  function trainerPool.trainGrnnMNetAdapter(mNetAdapter, teInput, teTarget)
     local criterion = nn.MSECriterion()
     local taTrainParam = trainerPool.getDefaultTrainParams(teInput:size(1),"CG" )
 
@@ -154,7 +154,7 @@ do
 
     for i=1, taTrainParam.maxIteration do
       local mNetRaw = mNetAdapter:getRaw()
-      errCurr = trainerPool.pri_trainGrnn3d_SingleRound(mNetRaw, teInput, teTarget, taTrainParam)
+      errCurr = trainerPool.pri_trainGrnn_SingleRound(mNetRaw, teInput, teTarget, taTrainParam)
 
       if errPrev <= errCurr or myUtil.isNan(errCurr)  then
         print("** early stop **")

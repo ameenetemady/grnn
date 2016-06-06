@@ -9,17 +9,11 @@ local lDataLoad = lDataLoad or require('./lDataLoad.lua')
 local exprSettings = lSettings.getExprSetting("d_1")
 
 -- load:
---local taTFs = lDataLoad.getData(exprSettings.strTFsNoNoiseFilePath)
---local taNonTF = lDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
-local taTFs = lDataLoad.getData(exprSettings.strTFsNoNoiseFilePath)
-local taNonTF = lDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
-local taKOs = lDataLoad.getData(exprSettings.strKOsFilePath)
+local isNoise = false
+local teInput, taTFNames, taKONames = lDataLoad.load2dInput(exprSettings, isNoise)
+local teTarget, taTargetNames = lDataLoad.loadTarget(exprSettings, isNoise)
 
--- Prepare
-local teInput = torch.cat(taTFs.teData, taKOs.teData, 2) -- todo: is this correct?
-local teTarget = taNonTF.teData
-
-local nRows = taKOs.teData:size(1)
+local nRows = teInput:size(1)
 print("Number of samples: " .. nRows)
 
 local taArchParam = { nHiddenLayers = 0,
@@ -37,7 +31,7 @@ local nMaxIter = 10
 for seed=1, nMaxIter do
   torch.manualSeed(seed)
   mlp = archFactory.mlp(taArchParam)
-  local f = trainerPool.trainGrnn3d(mlp, teInput, teTarget)
+  local f = trainerPool.trainGrnn(mlp, teInput, teTarget)
   print("MSE:" .. f .. ", seed: " .. seed)
 
   if f < fBest then

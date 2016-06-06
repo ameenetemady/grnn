@@ -20,7 +20,7 @@ local taParam = {
   teInput = teInput, 
   teTarget = teTarget, 
   mNetAdapter = MNetAdapter9s.new(taNetParam),
-  fuTrainer = trainerPool.trainGrnn3dMNetAdapter,
+  fuTrainer = trainerPool.trainGrnnMNetAdapter,
   fuTester = testerPool.getMSE}
 
 local kFoldRunner = KFoldRunner.new(taParam)

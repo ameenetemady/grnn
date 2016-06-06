@@ -13,7 +13,7 @@ function FoldRunMNetTrainer:__init(taParam)
     self.taTestResult = nil
 end
 
-function FoldRun:Run()
+function FoldRunMNetTrainer:Run()
 
   --train
   local taMNetTrainerParam = { teInput = self.taTrain[1],
