@@ -26,13 +26,13 @@ function runExperiment(strExprName, isNoise, taFnnParam)
   end
 
   local taParam = { 
-    nFolds = 5, 
-    nSeeds = 1, --10
+    nFolds = 10, -- 10
+    nSeeds = 10, --10
     teInput = teInput, 
     teTarget = teTarget, 
     mNetAdapter = FnnAdapter.new(taArchParam),
     fuTrainer = trainerPool.trainGrnnMNetAdapter,
-    taFuTrainerParams = { nMaxIteration = 2}, --200
+    taFuTrainerParams = { nMaxIteration = 200}, --200
     fuTester = testerPool.getMSE }
 
     local kFoldRunner = KFoldRunner.new(taParam, fuFoldRunFactory)
@@ -53,16 +53,16 @@ function getResultFilename(taFnnParam, strExprName, isNoise)
 end
 
 local isNoise = myUtil.getBoolFromStr(arg[1])
+local nHiddenLayers = arg[2] == nil and 0 or tonumber(arg[2])
 
-local taFnnParam = { nNodesPerLayer = 4, nHiddenLayers = 0 }
-local nMaxExprId = 10
+local taFnnParam = { nNodesPerLayer = 4, 
+                     nHiddenLayers = nHiddenLayers  }
+local nMaxExprId = 100 --100
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))
 
   local taExprResult = runExperiment(strExprName, isNoise, taFnnParam)
---  local strResultFilename = string.format("result/fnn_nh%d_nnpl%d_%s.table", 
---                                          taFnnParam.nHiddenLayers, taFnnParam.nNodesPerLayer, strExprName)
   local strResultFilename = getResultFilename(taFnnParam, strExprName, isNoise)
 
   torch.save(strResultFilename, taExprResult, "ascii")

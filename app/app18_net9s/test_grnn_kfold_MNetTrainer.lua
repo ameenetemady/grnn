@@ -25,7 +25,7 @@ function runExperiment(strExprName, isNoise)
     teTarget = teTarget, 
     mNetAdapter = MNetAdapter9s.new(taNetParam),
     fuTrainer = trainerPool.trainGrnnMNetAdapter,
-    taFuTrainerParams = { nMaxIteration = 1},--100
+    taFuTrainerParams = { nMaxIteration = 100},--100
     fuTester = testerPool.getMSE}
 
     local kFoldRunner = KFoldRunner.new(taParam, fuFoldRunFactory)
@@ -45,7 +45,7 @@ end
 
 
 local isNoise = myUtil.getBoolFromStr(arg[1])
-local nMaxExprId = 10
+local nMaxExprId = 100
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))
