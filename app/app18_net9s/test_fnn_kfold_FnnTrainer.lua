@@ -25,7 +25,7 @@ function runExperiment(strExprName, isNoise, taFnnParam)
   end
 
   local taParam = { 
-    nFolds = 10, 
+    nFolds = 3, 
     nSeeds = 5,
     teInput = teInput, 
     teTarget = teTarget, 
