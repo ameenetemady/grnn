@@ -12,9 +12,14 @@ do
     return { taGenes = taGenes, teData = teData }
   end
 
-  function lDataLoad.load3dInput(exprSettings)
-    local taTFs = lDataLoad.getData(exprSettings.strTFsNoNoiseFilePath)
-    local taKOs = lDataLoad.getData(exprSettings.strKOsFilePath)
+  function lDataLoad.load3dInput(exprSettings, isNoise)
+    isNoise = isNoise or false
+
+    local strTFFilepath = isNoise and exprSettings.strTFsFilePath or exprSettings.strTFsNoNoiseFilePath
+    local strKOFilepath = exprSettings.strKOsFilePath
+
+    local taTFs = lDataLoad.getData(strTFFilepath)
+    local taKOs = lDataLoad.getData(strKOFilepath)
     local nRows = taKOs.teData:size(1)
 
     local nTFs = taTFs.teData:size(2)

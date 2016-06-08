@@ -1,0 +1,4 @@
+./runOne.sh test_fnn_kfold_FnnTrainer.lua false 0
+./runOne.sh test_fnn_kfold_FnnTrainer.lua true 0
+./runOne.sh test_grnn_kfold_MNetTrainer.lua false
+./runOne.sh test_grnn_kfold_MNetTrainer.lua true

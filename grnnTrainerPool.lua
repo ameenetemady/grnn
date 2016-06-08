@@ -10,7 +10,7 @@ do
     local taTrainParam = {  --batchSize = 9, 
                             batchSize = math.floor(nRows),
                             criterion = nn.MSECriterion(),
-                            maxIteration = 10,
+                            nMaxIteration = 100,
                             coefL1 = 0.0,
                             coefL2 = 0.0,
                             strOptimMethod = strOptimMethod or "CG",
@@ -125,7 +125,7 @@ do
     local errPrev = math.huge
     local errCurr = math.huge
 
-    for i=1, taTrainParam.maxIteration do
+    for i=1, taTrainParam.nMaxIteration do
       errCurr = trainerPool.pri_trainGrnn_SingleRound(mNet, teInput, teTarget, taTrainParam)
 
       if errPrev <= errCurr or myUtil.isNan(errCurr)  then
@@ -144,15 +144,16 @@ do
     return errCurr
   end
 
-  function trainerPool.trainGrnnMNetAdapter(mNetAdapter, teInput, teTarget)
+  function trainerPool.trainGrnnMNetAdapter(mNetAdapter, teInput, teTarget, taTrainerParamsOverride)
     local criterion = nn.MSECriterion()
     local taTrainParam = trainerPool.getDefaultTrainParams(teInput:size(1),"CG" )
+    myUtil.updateTable(taTrainParam, taTrainerParamsOverride)
 
     local errPrev = math.huge
     local mNetAdapterPrev = nil
     local errCurr = math.huge
 
-    for i=1, taTrainParam.maxIteration do
+    for i=1, taTrainParam.nMaxIteration do
       local mNetRaw = mNetAdapter:getRaw()
       errCurr = trainerPool.pri_trainGrnn_SingleRound(mNetRaw, teInput, teTarget, taTrainParam)
 
