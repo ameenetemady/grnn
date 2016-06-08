@@ -23,15 +23,18 @@ do
         learningRate = 0.1,
         learningRateDecay = 0.9995,
         momentum = 0.1 }
+      taTrainParam.fuOptim = optim.sgd
   
     elseif taTrainParam.strOptimMethod == "LBFGS" then
       taTrainParam.taOptimParams = { 
         maxIter = 1000,
         lineSearch = optim.lswolfe }
+      taTrainParam.fuOptim = optim.lbfgs
 
     elseif taTrainParam.strOptimMethod == "CG" then
       taTrainParam.taOptimParams = {
         maxIter = 20 }
+      taTrainParam.fuOptim = optim.cg
 
     else
       error("invalid operation")
@@ -90,7 +93,7 @@ do
         return f, gradParameters
       end --fuEval
 
-      optim.sgd(fuEval, parameters, taTrainParam.taOptimParams)
+      taTrainParam.fuOptim(fuEval, parameters, taTrainParam.taOptimParams)
     end
 
     return trainerPool.getErr(mNet, teInput, teTarget, taTrainParam)
