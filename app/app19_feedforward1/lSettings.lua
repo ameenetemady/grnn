@@ -3,7 +3,7 @@ local lSettings = {}
 
 do
   local strBaseGnwPath = "/home/ameen/gnw"
-  local strAppBase = string.format("%s/app18_net9s", strBaseGnwPath)
+  local strAppBase = string.format("%s/app19_feedforward1", strBaseGnwPath)
 
   function lSettings.getExprSetting(strExpName)
     return cSettings.getExprSetting(strExpName, strAppBase)

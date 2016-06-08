@@ -3,15 +3,15 @@ torch.manualSeed(0)
 local archFactory = archFactory or require('../../../MyCommon/archFactory.lua')
 local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')
 local lSettings = lSettings or require('./lSettings.lua')
-local lDataLoad = lDataLoad or require('./lDataLoad.lua')
+local cDataLoad = cDataLoad or require('../common/cDataLoad.lua')
 
 
 local exprSettings = lSettings.getExprSetting("d_1")
 
 -- load:
 local isNoise = false
-local teInput, taTFNames, taKONames = lDataLoad.load2dInput(exprSettings, isNoise)
-local teTarget, taTargetNames = lDataLoad.loadTarget(exprSettings, isNoise)
+local teInput, taTFNames, taKONames = cDataLoad.load2dInput(exprSettings, isNoise)
+local teTarget, taTargetNames = cDataLoad.loadTarget(exprSettings, isNoise)
 
 local nRows = teInput:size(1)
 print("Number of samples: " .. nRows)

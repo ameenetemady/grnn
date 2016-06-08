@@ -2,15 +2,15 @@ local testerPool = testerPool or require('../../../MyCommon/testerPool.lua')
 --local grnnArchFactory = grnnArchFactory or require('../../grnnArchFactory.lua')
 local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')
 local lSettings = lSettings or require('./lSettings.lua')
-local lDataLoad = lDataLoad or require('./lDataLoad.lua')
+local cDataLoad = cDataLoad or require('../common/cDataLoad.lua')
 require('../../FoldRun.lua')
 require('../../KFoldRunner.lua')
 require('./MNetAdapter9s.lua')
 
 
 local exprSettings = lSettings.getExprSetting("d_1_small")
-local teInput, taTFNames, taKONames = lDataLoad.load3dInput(exprSettings)
-local teTarget, taTargetNames = lDataLoad.loadTarget(exprSettings)
+local teInput, taTFNames, taKONames = cDataLoad.load3dInput(exprSettings)
+local teTarget, taTargetNames = cDataLoad.loadTarget(exprSettings)
 
 local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 

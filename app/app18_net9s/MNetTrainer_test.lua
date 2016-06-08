@@ -1,7 +1,7 @@
 local testerPool = testerPool or require('../../../MyCommon/testerPool.lua')
 local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')
 local lSettings = lSettings or require('./lSettings.lua')
-local lDataLoad = lDataLoad or require('./lDataLoad.lua')
+local cDataLoad = cDataLoad or require('../common/cDataLoad.lua')
 require('../../FoldRun.lua')
 require('../../KFoldRunner.lua')
 require('./MNetAdapter9s.lua')
@@ -15,8 +15,8 @@ local MNetTrainer_test = {}
 function MNetTrainer_test.pri_getGeneSlice_test1()
 
   local exprSettings = lSettings.getExprSetting("d_1_small")
-  local teInput, taTFNames, taKONames = lDataLoad.load3dInput(exprSettings)
-  teTarget, taTargetNames = lDataLoad.loadTarget(exprSettings)
+  local teInput, taTFNames, taKONames = cDataLoad.load3dInput(exprSettings)
+  teTarget, taTargetNames = cDataLoad.loadTarget(exprSettings)
 
   local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 
@@ -41,8 +41,8 @@ end
 function MNetTrainer_test.trainUnit_test1()
 
   local exprSettings = lSettings.getExprSetting("d_1_small")
-  local teInput, taTFNames, taKONames = lDataLoad.load3dInput(exprSettings)
-  local teTarget, taTargetNames = lDataLoad.loadTarget(exprSettings)
+  local teInput, taTFNames, taKONames = cDataLoad.load3dInput(exprSettings)
+  local teTarget, taTargetNames = cDataLoad.loadTarget(exprSettings)
 
   local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 
@@ -72,8 +72,8 @@ end
 function MNetTrainer_test.trainEachUnit_test1()
 
   local exprSettings = lSettings.getExprSetting("d_2")
-  local teInput, taTFNames, taKONames = lDataLoad.load3dInput(exprSettings)
-  local teTarget, taTargetNames = lDataLoad.loadTarget(exprSettings)
+  local teInput, taTFNames, taKONames = cDataLoad.load3dInput(exprSettings)
+  local teTarget, taTargetNames = cDataLoad.loadTarget(exprSettings)
 
   local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 

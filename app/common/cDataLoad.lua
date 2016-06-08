@@ -1,8 +1,8 @@
 local dataLoad = dataLoad or require('../../../MyCommon/dataLoad.lua')
-local lDataLoad = {}
+local cDataLoad = {}
 
 do
-  function lDataLoad.getData(strFilePath)
+  function cDataLoad.getData(strFilePath)
     print(strFilePath)
 
     local taGenes = dataLoad.getHeader(strFilePath)
@@ -12,14 +12,14 @@ do
     return { taGenes = taGenes, teData = teData }
   end
 
-  function lDataLoad.load3dInput(exprSettings, isNoise)
+  function cDataLoad.load3dInput(exprSettings, isNoise)
     isNoise = isNoise or false
 
     local strTFFilepath = isNoise and exprSettings.strTFsFilePath or exprSettings.strTFsNoNoiseFilePath
     local strKOFilepath = exprSettings.strKOsFilePath
 
-    local taTFs = lDataLoad.getData(strTFFilepath)
-    local taKOs = lDataLoad.getData(strKOFilepath)
+    local taTFs = cDataLoad.getData(strTFFilepath)
+    local taKOs = cDataLoad.getData(strKOFilepath)
     local nRows = taKOs.teData:size(1)
 
     local nTFs = taTFs.teData:size(2)
@@ -34,28 +34,28 @@ do
     return teInput, taTFs.taGenes, taKOs.taGenes
   end
 
-  function lDataLoad.load2dInput(exprSettings, isNoise)
+  function cDataLoad.load2dInput(exprSettings, isNoise)
     isNoise = isNoise or false
 
     local strTFFilepath = isNoise and exprSettings.strTFsFilePath or exprSettings.strTFsNoNoiseFilePath
     local strKOFilepath = exprSettings.strKOsFilePath
 
-    local taTF = lDataLoad.getData(strTFFilepath)
-    local taKO = lDataLoad.getData(strKOFilepath)
+    local taTF = cDataLoad.getData(strTFFilepath)
+    local taKO = cDataLoad.getData(strKOFilepath)
 
     local teInput = torch.cat(taTF.teData, taKO.teData, 2)
 
     return teInput, taTF, taKO
   end
 
-  function lDataLoad.loadTarget(exprSettings, isNoise)
+  function cDataLoad.loadTarget(exprSettings, isNoise)
     isNoise = isNoise or false
 
     local strNonTFFilepath = isNoise and exprSettings.strNonTFsFilePath or exprSettings.strNonTFsNoNoiseFilePath
-    local taNonTF = lDataLoad.getData(strNonTFFilepath)
+    local taNonTF = cDataLoad.getData(strNonTFFilepath)
 
     return taNonTF.teData, taNonTF.taGenes
   end
 
-  return lDataLoad
+  return cDataLoad
 end
