@@ -1,0 +1,15 @@
+./runOne.sh test_fnn_kfold_FnnTrainer.lua false 0
+./runOne.sh test_fnn_kfold_FnnTrainer.lua true 0
+./runOne.sh test_grnn_kfold_MNetTrainer.lua false
+./runOne.sh test_grnn_kfold_MNetTrainer.lua true
+
+14: ./runOne.sh test_fnn_kfold_FnnTrainer.lua false 1
+13: ./runOne.sh test_fnn_kfold_FnnTrainer.lua false 2
+12: ./runOne.sh test_fnn_kfold_FnnTrainer.lua false 3
+11: ./runOne.sh test_fnn_kfold_FnnTrainer.lua false 4
+
+
+14: ./runOne.sh test_fnn_kfold_FnnTrainer.lua true 4
+13: ./runOne.sh test_fnn_kfold_FnnTrainer.lua true 3
+12: ./runOne.sh test_fnn_kfold_FnnTrainer.lua true 2
+11: ./runOne.sh test_fnn_kfold_FnnTrainer.lua true 1
