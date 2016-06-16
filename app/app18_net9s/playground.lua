@@ -3,14 +3,14 @@ torch.manualSeed(0)
 local grnnArchFactory = grnnArchFactory or require('../../grnnArchFactory.lua')
 local trainerPool = trainerPool or require('../..//grnnTrainerPool.lua')
 local lSettings = lSettings or require('./lSettings.lua')
-local lDataLoad = lDataLoad or require('./lDataLoad.lua')
+local cDataLoad = cDataLoad or require('./cDataLoad.lua')
 
 
 --[[
 local exprSettings = lSettings.getExprSetting("d_1")
-local taTFs = lDataLoad.getData(exprSettings.strTFsFilePath)
-local taNonTF = lDataLoad.getData(exprSettings.strNonTFsFilePath)
-local taKOs = lDataLoad.getData(exprSettings.strKOsFilePath)
+local taTFs = cDataLoad.getData(exprSettings.strTFsFilePath)
+local taNonTF = cDataLoad.getData(exprSettings.strNonTFsFilePath)
+local taKOs = cDataLoad.getData(exprSettings.strKOsFilePath)
 --]]
 
 local nRows = 100

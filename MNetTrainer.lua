@@ -56,8 +56,13 @@ function MNetTrainer:trainUnit(strGene)
                                                     self:pri_getInitWeights(teUnitInput, teUnitTarget, taGeneInfo.fuInit, nGid)) 
  
   -- Train
-  local dTrainErr
-  dTrainErr, mGxTrained = self.taParam.fuTrainer(mGxClonable, teUnitInput, teUnitTarget, self.taParam.taFuTrainerParams)
+  local dTrainErr, mGxTrained
+--  if strGene ~= "G7" then --ToDo: just for testing ...
+    dTrainErr, mGxTrained = self.taParam.fuTrainer(mGxClonable, teUnitInput, teUnitTarget, self.taParam.taFuTrainerParams)
+--  else
+--    mGxTrained = mGxClonable:clone()
+--  end
+
   local dTestErr = self.taParam.fuTester(mGxClonable:getRaw(), teUnitInput, teUnitTarget)
   print(string.format("trainUnit: error for %s: %f", strGene, dTestErr))
 

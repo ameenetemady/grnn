@@ -27,7 +27,7 @@ do
   
     elseif taTrainParam.strOptimMethod == "LBFGS" then
       taTrainParam.taOptimParams = { 
-        maxIter = 1000,
+        maxIter = 100,
         lineSearch = optim.lswolfe }
       taTrainParam.fuOptim = optim.lbfgs
 

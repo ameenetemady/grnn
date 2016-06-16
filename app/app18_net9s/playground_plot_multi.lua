@@ -1,6 +1,6 @@
 local lfs = lfs or require 'lfs'
 local lSettings = lSettings or require('./lSettings.lua')
-local lDataLoad = lDataLoad or require('./lDataLoad.lua')
+local cDataLoad = cDataLoad or require('../common/cDataLoad.lua')
 local plotUtil = plotUtil or require('../../../MyCommon/plotUtil.lua')
 
 local taPairsNonTF = {
@@ -14,13 +14,13 @@ local taPairsNonTF = {
 local nPairs = table.getn(taPairsNonTF)
 print(nPairs)
 
-for exprId=1, 20 do
+for exprId=1, 2 do
 
   local strExpName = string.format("d_%d", exprId)
   lfs.mkdir(string.format("figure/%s", strExpName))
 
   local exprSettings = lSettings.getExprSetting(strExpName)
-  local taNonTF = lDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
+  local taNonTF = cDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
   print(taNonTF.taGenes)
 
   print("** " .. strExpName .. " **" )

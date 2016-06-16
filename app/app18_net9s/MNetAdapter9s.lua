@@ -1,7 +1,7 @@
 require('../../requireBaseUnits.lua')
 
-local syngTwoAutoSimple = syngTwoAutoSimple or require('../../SyngTwoAutoSimple.lua')
-local syngOneAutoSimple = syngOneAutoSimple or require('../../SyngOneAutoSimple.lua')
+local syngTwoAutoSimpleMult = syngTwoAutoSimpleMult or require('../../SyngTwoAutoSimpleMult.lua')
+local syngOneAutoSmart = syngOneAutoSmart or require('../../SyngOneAutoSmart.lua')
 local grnnArchUnits = grnnArchUnits or require('../../grnnArchUnits.lua')
 
 local MNetAdapter9s, parent = MNetAdapter9s or torch.class("MNetAdapter9s", "AMNetAdapter")
@@ -35,19 +35,19 @@ function MNetAdapter9s.getNewMNet(taWeights)
   taWeights = taWeights or {}
 
   local fuS1 = function(weight)
-    return syngOneAutoSimple.new(weight)
+    return syngOneAutoSmart.new(weight)
   end
 
   local fuS2 = function(weight)
-    return syngTwoAutoSimple.new(weight)
+    return syngTwoAutoSimpleMult.new(weight)
   end
 
   local fuInitS1 = function(teInputSlice, teTargetSclice, teKOSlice)
-    return syngOneAutoSimple.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
+    return syngOneAutoSmart.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
   end
 
   local fuInitS2 = function(teInputSlice, teTargetSclice, teKOSlice)
-    return syngTwoAutoSimple.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
+    return syngTwoAutoSimpleMult.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
   end
 
 

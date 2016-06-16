@@ -20,20 +20,20 @@ function runExperiment(strExprName, isNoise)
   end
 
   local taParam = { 
-    nFolds = 2, --10
+    nFolds = 5, --10
     teInput = teInput, 
     teTarget = teTarget, 
     mNetAdapter = MNetAdapter9s.new(taNetParam),
     fuTrainer = trainerPool.trainGrnnMNetAdapter,
-    taFuTrainerParams = { nMaxIteration = 2},--100
+    taFuTrainerParams = { nMaxIteration = 20},--20
     fuTester = testerPool.getMSE}
 
     local kFoldRunner = KFoldRunner.new(taParam, fuFoldRunFactory)
-    while kFoldRunner:hasMore() do
+--    while kFoldRunner:hasMore() do
       local foldRun = kFoldRunner:getNext()
       foldRun:Run()
       print(foldRun:getSummaryTable())
-    end
+--    end
 
   return kFoldRunner:getAggrSummaryTable()
 end
@@ -45,7 +45,7 @@ end
 
 
 local isNoise = myUtil.getBoolFromStr(arg[1])
-local nMaxExprId = 3 --100
+local nMaxExprId = 5 --100
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))

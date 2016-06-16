@@ -1,14 +1,14 @@
 local lSettings = lSettings or require('./lSettings.lua')
-local lDataLoad = lDataLoad or require('./lDataLoad.lua')
+local cDataLoad = cDataLoad or require('./cDataLoad.lua')
 local plotUtil = plotUtil or require('../../../MyCommon/plotUtil.lua')
 
 for exprId=1, 20 do
 
   local strExpName = string.format("d_%d", exprId)
   local exprSettings = lSettings.getExprSetting(strExpName)
-  local taTFs = lDataLoad.getData(exprSettings.strTFsNoNoiseFilePath)
-  local taNonTF = lDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
-  local taKOs = lDataLoad.getData(exprSettings.strKOsFilePath)
+  local taTFs = cDataLoad.getData(exprSettings.strTFsNoNoiseFilePath)
+  local taNonTF = cDataLoad.getData(exprSettings.strNonTFsNoNoiseFilePath)
+  local taKOs = cDataLoad.getData(exprSettings.strKOsFilePath)
 
   local xId = 6
   local yId = 7

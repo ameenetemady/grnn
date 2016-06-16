@@ -26,13 +26,13 @@ function runExperiment(strExprName, isNoise, taFnnParam)
   end
 
   local taParam = { 
-    nFolds = 2, -- 10
-    nSeeds = 2, --10
+    nFolds = 10, -- 10
+    nSeeds = 5, --10
     teInput = teInput, 
     teTarget = teTarget, 
     mNetAdapter = FnnAdapter.new(taArchParam),
     fuTrainer = trainerPool.trainGrnnMNetAdapter,
-    taFuTrainerParams = { nMaxIteration = 2}, --200
+    taFuTrainerParams = { nMaxIteration = 20}, --200
     fuTester = testerPool.getMSE }
 
     local kFoldRunner = KFoldRunner.new(taParam, fuFoldRunFactory)
@@ -57,7 +57,7 @@ local nHiddenLayers = arg[2] == nil and 0 or tonumber(arg[2])
 
 local taFnnParam = { nNodesPerLayer = 4, 
                      nHiddenLayers = nHiddenLayers  }
-local nMaxExprId = 3 --100
+local nMaxExprId = 5 --100
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))

@@ -104,8 +104,10 @@ function KFoldRunner:getAggrSummaryTable()
   local taAggrSummary = {}
 
   for i=1, self.nFolds do
-    local taCurrSummary = self.taRunners[i]:getSummaryTable()
-    table.insert(taAggrSummary, taCurrSummary)
+    if self.taRunners[i] ~= nil then
+      local taCurrSummary = self.taRunners[i]:getSummaryTable()
+      table.insert(taAggrSummary, taCurrSummary)
+    end
   end
 
   return taAggrSummary
