@@ -1,6 +1,6 @@
 require('../../requireBaseUnits.lua')
 
-local syngTwoAutoSimpleMult = syngTwoAutoSimpleMult or require('../../SyngTwoAutoSimpleMult.lua')
+local syngTwoAutoSimpleSmart = syngTwoAutoSimpleSmart or require('../../SyngTwoAutoSimpleSmart.lua')
 local syngOneAutoSmart = syngOneAutoSmart or require('../../SyngOneAutoSmart.lua')
 local grnnArchUnits = grnnArchUnits or require('../../grnnArchUnits.lua')
 
@@ -39,7 +39,7 @@ function MFeedforward1Adapter.getNewMNet(taWeights)
   end
 
   local fuS2 = function(weight)
-    return syngTwoAutoSimpleMult.new(weight)
+    return syngTwoAutoSimpleSmart.new(weight)
   end
 
   local fuInitS1 = function(teInputSlice, teTargetSclice, teKOSlice)
@@ -47,7 +47,7 @@ function MFeedforward1Adapter.getNewMNet(taWeights)
   end
 
   local fuInitS2 = function(teInputSlice, teTargetSclice, teKOSlice)
-    return syngTwoAutoSimpleMult.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
+    return syngTwoAutoSimpleSmart.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
   end
 
 

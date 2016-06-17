@@ -1,27 +1,26 @@
 local lfs = lfs or require 'lfs'
 local lSettings = lSettings or require('./lSettings.lua')
-local cDataLoad = cDataLoad or require('../common/cDataLoad.lua')
+
 local plotUtil = plotUtil or require('../../../MyCommon/plotUtil.lua')
 local testerPool = testerPool or require('../../../MyCommon/testerPool.lua')
 local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')
 
 require('./MFeedforward1Adapter.lua')
 require("../../MNetTrainer.lua")
+require("../common/CDataLoader.lua")
 
 
+for exprId=4, 4 do
 
-for exprId=1, 5 do
 
 local strExpName = string.format("d_%d", exprId)
 lfs.mkdir(string.format("figure/%s", strExpName))
 
 local exprSettings = lSettings.getExprSetting(strExpName)
+local dataLoader = CDataLoader.new(exprSettings, false)
 
-
-
-
-local teInput, taTFNames, taKONames = cDataLoad.load3dInput(exprSettings)
-local teTarget, taTargetNames = cDataLoad.loadTarget(exprSettings)
+local teInput, taTFNames, taKONames = dataLoader:load3dInput(exprSettings, false)
+local teTarget, taTargetNames = dataLoader:loadTarget(exprSettings, false)
 
 local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 
@@ -35,7 +34,7 @@ local taMNetTrainerParam = { teInput = teInput,
                              teTarget = teTarget,
                              fuTrainer = fuTrainer,
                              fuTester = fuTester,
-                             taFuTrainerParams = { nMaxIteration = 50}
+                             taFuTrainerParams = { nMaxIteration = 100}
                            }
 
 local mNetTrainer = MNetTrainer.new(taMNetTrainerParam, mNetAdapter)
@@ -44,7 +43,8 @@ mNetTrainer:trainEachUnit()
 dErr, mNetTrainer.mNetAdapter = mNetTrainer:trainTogether()
 
 dErr = fuTester(mNetTrainer.mNetAdapter:getRaw(), teInput, teTarget)
-print(string.format("%d) MSE error:%f",arg[1], dErr))
+print("##############" .. strExpName)
+print(string.format("%d) ######### MSE error:%f",arg[1], dErr))
 
 for k, v in pairs(mNetTrainer.mNetAdapter.taWeights) do
   print(k, tostring(torch.repeatTensor(v, 1, 1)))

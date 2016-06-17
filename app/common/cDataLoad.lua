@@ -45,7 +45,7 @@ do
 
     local teInput = torch.cat(taTF.teData, taKO.teData, 2)
 
-    return teInput, taTF, taKO
+    return teInput, taTF.taGenes, taKO.taGenes
   end
 
   function cDataLoad.loadTarget(exprSettings, isNoise)
