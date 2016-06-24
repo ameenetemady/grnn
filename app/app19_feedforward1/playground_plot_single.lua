@@ -10,23 +10,24 @@ require("../../MNetTrainer.lua")
 require("../common/CDataLoader.lua")
 
 
-for exprId=4, 4 do
+for exprId=1, 5 do
 
 
 local strExpName = string.format("d_%d", exprId)
 lfs.mkdir(string.format("figure/%s", strExpName))
 
 local exprSettings = lSettings.getExprSetting(strExpName)
-local dataLoader = CDataLoader.new(exprSettings, false)
+local dataLoader = CDataLoader.new(exprSettings, false, true, 1.3)
 
 local teInput, taTFNames, taKONames = dataLoader:load3dInput(exprSettings, false)
 local teTarget, taTargetNames = dataLoader:loadTarget(exprSettings, false)
 
+----[[
 local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 
 local mNetAdapter = MFeedforward1Adapter.new(taNetParam)
 local fuTrainer = trainerPool.trainGrnnMNetAdapter
-local fuTester = testerPool.getMSE
+local fuTester = testerPool.getMAE
 
 local mNet = mNetAdapter:getRaw()
 
@@ -83,6 +84,6 @@ local teOutput = mNetTrainer.mNetAdapter:getRaw():forward(teInput)
       plotUtil.plot2d(teInputX, teTargetX, taParam, teInputX, teOutputX)
 
     end
-
+--]]
   end
 

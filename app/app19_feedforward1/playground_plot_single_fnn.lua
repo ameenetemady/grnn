@@ -1,26 +1,28 @@
 local lfs = lfs or require 'lfs'
-local lSettings = lSettings or require('./lSettings.lua')
 local cDataLoad = cDataLoad or require('../common/cDataLoad.lua')
+local lSettings = lSettings or require('./lSettings.lua')
 local plotUtil = plotUtil or require('../../../MyCommon/plotUtil.lua')
 local testerPool = testerPool or require('../../../MyCommon/testerPool.lua')
 local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')
 
 require('../../FnnAdapter.lua')
 require("../../FnnTrainer.lua")
+require("../common/CDataLoader.lua")
 
 local taFnnParam = { nNodesPerLayer = 4, 
                      nHiddenLayers = 1}
 
-for exprId=4, 4 do
+for exprId=1, 5 do
 
 
 local strExprName = string.format("d_%d", exprId)
 lfs.mkdir(string.format("figure/%s", strExprName))
   local exprSettings = lSettings.getExprSetting(strExprName)
+  local dataLoader = CDataLoader.new(exprSettings, false, true)
 
-  local teInput, taTFNames, taKONames = cDataLoad.load2dInput(exprSettings, false)
+  local teInput, taTFNames, taKONames = dataLoader:load2dInput()
   print(taTargetNames)
-  local teTarget, taTargetNames = cDataLoad.loadTarget(exprSettings, false)
+  local teTarget, taTargetNames = dataLoader:loadTarget()
 
   -- init params
   local taArchParam = { nHiddenLayers = taFnnParam.nHiddenLayers,
@@ -37,7 +39,7 @@ lfs.mkdir(string.format("figure/%s", strExprName))
     teTarget = teTarget, 
     fuTrainer = trainerPool.trainGrnnMNetAdapter,
     taFuTrainerParams = { nMaxIteration = 20}, --200
-    fuTester = testerPool.getMSE }
+    fuTester = testerPool.getMAE }
 
 
 local mNetAdapter = FnnAdapter.new(taArchParam)

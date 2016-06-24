@@ -1,19 +1,22 @@
 local testerPool = testerPool or require('../../../MyCommon/testerPool.lua')
 local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')
 local lSettings = lSettings or require('./lSettings.lua')
-local cDataLoad = cDataLoad or require('../common/cDataLoad.lua')
 local myUtil = myUtil or require('../../../MyCommon/util.lua')
 require('../../FoldRun.lua')
 require('../../FoldRunFnnTrainer.lua')
 require('../../KFoldRunner.lua')
 require('../../FnnAdapter.lua')
+require('../common/CDataLoader.lua')
 
 function runExperiment(strExprName, isNoise, taFnnParam)
   local exprSettings = lSettings.getExprSetting(strExprName)
+  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 1.3)
 
   --load
-  local teInput, taTFNames, taKONames = cDataLoad.load2dInput(exprSettings, isNoise)
-  local teTarget, taTargetNames = cDataLoad.loadTarget(exprSettings, isNoise)
+  local teInput, taTFNames, taKONames = dataLoader:load2dInput()
+  local teTarget, taTargetNames = dataLoader:loadTarget()
+
+  print(string.format("------------------------ Number of samples: %d -------------------", teTarget:size(1)))
 
   -- init params
   local taArchParam = { nHiddenLayers = taFnnParam.nHiddenLayers,
@@ -33,7 +36,7 @@ function runExperiment(strExprName, isNoise, taFnnParam)
     mNetAdapter = FnnAdapter.new(taArchParam),
     fuTrainer = trainerPool.trainGrnnMNetAdapter,
     taFuTrainerParams = { nMaxIteration = 20}, --200
-    fuTester = testerPool.getMSE }
+    fuTester = testerPool.getMAE }
 
     local kFoldRunner = KFoldRunner.new(taParam, fuFoldRunFactory)
     while kFoldRunner:hasMore() do
@@ -57,7 +60,7 @@ local nHiddenLayers = arg[2] == nil and 0 or tonumber(arg[2])
 
 local taFnnParam = { nNodesPerLayer = 4, 
                      nHiddenLayers = nHiddenLayers  }
-local nMaxExprId = 5 --100
+local nMaxExprId = 10 --100
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))

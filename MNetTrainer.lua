@@ -21,7 +21,7 @@ function MNetTrainer:pri_getGeneSlice(strGene)
 
   -- Otherwise it should be in TFs
   nGid = myUtil.findIndexInArray(self.mNetAdapter.taParam.taTFNames, strGene)
-  assert(nGid ~= nil, "Unexpected! Where is it then?")
+  assert(nGid ~= nil, string.format("Unexpected! Where is \"%s\" then?", strGene))
   return self.taParam.teInput:narrow(2, nGid, 1):select(3, 1)
 end
 
