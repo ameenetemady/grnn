@@ -1,3 +1,4 @@
+*.table
 *.png
 app/app10_cascadeB/cascadeB.pdf
 app/app10_cascadeB/fnn.model
