@@ -31,8 +31,9 @@ do
   function aggr_result.getAggrSummary(taInfo)
     local taAggrData = {}
     aggr_result.pri_SetHeader(taAggrData, taInfo.taFields)
+    local nMinId = taInfo.nMinId or 1
 
-    for i=1, taInfo.nMaxId do
+    for i=nMinId, taInfo.nMaxId do
       local strFilename = string.format(taInfo.strFormat, i)
       local taCurrData = torch.load(strFilename, "ascii")
       aggr_result.pri_AppendData(taAggrData, taCurrData)
