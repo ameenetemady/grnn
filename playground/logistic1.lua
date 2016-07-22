@@ -1,11 +1,12 @@
 require 'gnuplot'
 require 'nn'
+local grad = require 'autograd'
 
 local logistic = {}
 
 function logistic.logisticNew(teInput, taWeights)
-  local teX1 = teInput:select(2, 1)
-  local teX2 = teInput:select(2, 2)
+  local teX1 = teInput:narrow(2, 1, 1)
+  local teX2 = teInput:narrow(2, 2, 1)
 
   local teH1 = torch.exp(torch.mul(teX1, taWeights.p1))
   local teH2 = torch.exp(torch.mul(teX2, taWeights.p2))
@@ -82,9 +83,73 @@ function logistic.test1()
 
 end
 
+function logistic.test2_autograd()
+  local params = { p=torch.Tensor({1.0,-1.1 }) }
+
+  fuLoss = function(params, teW, teX, teY)
+    local nRows = torch.size(teY, 1)
+
+    -- Loss function: |Aw-B|
+    
+    -- a) construct A
+    local teX1 = torch.narrow(teX, 2, 1, 1)
+    local teX2 = torch.narrow(teX, 2, 2, 1)
+
+    local teH1 = torch.exp(torch.mul(teX1, params.p[1]))
+    local teH2 = torch.exp(torch.mul(teX2, params.p[2]))
+
+    local teA = torch.cat({torch.ones(nRows, 1),
+                          teH1,
+                          torch.mul(torch.cmul(teY, teH1), -1),
+                          teH2,
+                          torch.mul(torch.cmul(teY, teH2), -1)})
+
+    -- b) construct B
+    local teB = torch.Tensor(nRows, 1)
+    torch.select(teB, 2, 1):copy(teY)
+
+
+    local teResBase = torch.add(torch.bmm(torch.view(teA, 1, teA:size(1), teA:size(2)), 
+                                          torch.view(teW, 1, teW:size(1), teW:size(2))),
+                               torch.mul(teB, -1))
+
+--    teResBase = torch.view(teResBase, nRows, 1)
+
+    local dRes = torch.bmm(torch.transpose(teResBase, 2, 3), teResBase)
+    return dRes[1][1][1]
+  end
+
+  local nRows = 200
+  local taWeights = { t0=0, t1=1, t2=1, b1=1, b2=1.5, p1=1, p2=-1 }
+  local teX = torch.rand(nRows, 2)*10 - 5 
+  local teY = logistic.logisticNew(teX, taWeights)
+
+--  local dLoss = fuLoss(params, taWeights, teX, teY)
+--  print(dLoss)
+
+  local fuGradLoss = grad(fuLoss,{
+    debugHook = function(debugger, msg)
+      debugger.showDot()
+      print(msg)
+      os.exit(0)
+    end
+  })
+
+  local teW = torch.Tensor({{taWeights.t0}, 
+                            {taWeights.t1},
+                            {taWeights.b1},
+                            {taWeights.t2},
+                            {taWeights.b2}})
+  local teGradParams, loss = fuGradLoss(params, teW, teX, teY)
+
+  print(teGradParams.p)
+  print(loss)
+end
+
 function  logistic.all()
   --logistic.logisticNew_test1_x1Zero()
-  logistic.test1()
+  --logistic.test1()
+  logistic.test2_autograd()
 end
 
 logistic.all()
