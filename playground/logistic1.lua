@@ -54,11 +54,11 @@ function logistic.plotZeros(taWeights, plotId, xmin, xmax, ymin, ymax)
   local plotId = plotId or 1
   local nRows = 200
 
-  local input1 = torch.rand(nRows, 2)*10 - 5 
+  local input1 = torch.rand(nRows, 2)*5 
   input1:select(2, 1):fill(0)
   local output1 = logistic.logisticNew(input1, taWeights)
 
-  input2 = torch.rand(nRows, 2)*10 - 5 
+  input2 = torch.rand(nRows, 2)*5 
   input2:select(2, 2):fill(0)
   output2 = logistic.logisticNew(input2, taWeights)
 
@@ -73,6 +73,8 @@ function logistic.plotZeros(taWeights, plotId, xmin, xmax, ymin, ymax)
   ymin = ymin or ''
   ymax = ymax or ''
   gnuplot.axis({xmin, xmax, ymin, ymax})
+
+  return nil, nil, math.min(output1:min(), output2:min()), math.max(output1:max(), output2:max())
 
 end
 
@@ -106,7 +108,7 @@ function logistic.test1()
   -- generate data:
   local nRows = 200
   local taWeights = { t0=0, t1=1, t2=1, b1=1, b2=1.5, p1=1, p2=-1 }
-  local teX = torch.rand(nRows, 2)*10 - 5 
+  local teX = torch.rand(nRows, 2)*5 
   local teY = logistic.logisticNew(teX, taWeights)
 
   -- fit:
@@ -152,21 +154,36 @@ function fuLoss(myParams1, teW, teX, teY)
                                           torch.view(teW, 1, teW:size(1), teW:size(2))),
                                torch.mul(teB, -1))
 
-    local dRes = torch.bmm(torch.transpose(teResBase, 2, 3), teResBase)
---    print("teResBase:")
---    print(teResBase.value)
-    return dRes[1][1][1]
+    local dRes = torch.bmm(torch.transpose(teResBase, 2, 3), teResBase)[1][1][1]
+
+    --adding regularization here:
+    --todo: try this with fuLoss2 instead:
+    local dLambda= 0.005
+    dRes = dRes + dLambda * torch.sum(torch.pow(myParams1, 2)) 
+
+    return dRes
   end
 
 function fuLoss2(teP, teW, teX, teY)
 -- ={ t0 = teW[1], t1 = teW[2], t2 = teW[4], b1 = teW[3], b2 = teW[5], p1=teP[1], p2=teP[2] }
   local teWeights = torch.cat(torch.select(teW, 2, 1), teP) 
   local nRows = torch.size(teY, 1)
-  local teYPred = torch.view(logistic.logisticNewTe(teX, teWeights), 1, nRows, 1)
+  local teYRes = torch.add(logistic.logisticNewTe(teX, teWeights),
+                           torch.mul(teY, -1))
+  local teYRes3d = torch.view( teYRes, 1, nRows, 1)
+--  local teYPred = torch.view(logistic.logisticNewTe(teX, teWeights), 1, nRows, 1)
+  
+  print("teYPred:size()")
+  print(teYRes3d:size())
 
-  local dRes = torch.bmm(torch.transpose(teYPred, 2, 3), teYPred)
+  local dRes = torch.bmm(torch.transpose(teYRes3d, 2, 3), teYRes3d)[1][1][1]
 
-  return dRes[1][1][1]
+  local dLambda= 0.005
+  dRes = dRes + dLambda * torch.sum(torch.pow(teP, 2)) 
+  print("********:")
+  print(dRes.value)
+
+  return dRes
 end
 
 
@@ -175,7 +192,7 @@ function logistic.test2_autograd()
 
   local nRows = 200
   local taWeights = { t0=0, t1=1, t2=1, b1=1, b2=1.5, p1=1, p2=-1 }
-  local teX = torch.rand(nRows, 2)*10 - 5 
+  local teX = torch.rand(nRows, 2)*5 
   local teY = logistic.logisticNew(teX, taWeights)
   local teW = torch.Tensor({{taWeights.t0}, 
                             {taWeights.t1},
@@ -210,9 +227,9 @@ end
 function  logistic.test3_autogradOptim()
   torch.manualSeed(1)
 
-  local nRows = 200
-  local taWeights = { t0=0, t1=1, t2=1, b1=1, b2=1.5, p1=1, p2=-1 }
-  local teX = torch.rand(nRows, 2)*10 - 5 
+  local nRows = 20
+  local taWeights = { t0=0.0, t1=1.5, t2=1, b1=1.5, b2=1.0, p1=-1.0, p2=1.0 }
+  local teX = torch.rand(nRows, 2)*5 
   local teY = logistic.logisticNew(teX, taWeights)
   local teW = torch.Tensor({{taWeights.t0}, 
                            {taWeights.t1},
@@ -220,7 +237,8 @@ function  logistic.test3_autogradOptim()
                            {taWeights.t2},
                            {taWeights.b2}})
 
-  local teInitParam =  torch.Tensor({1.1,-1})
+  --local teInitParam =  torch.Tensor({1.5,-1.5})
+  local teInitParam =  torch.Tensor({-1.5,1.5})
 
   --[[
   local taInitWeight = myUtil.shallowCopy(taWeights)
@@ -235,26 +253,26 @@ function  logistic.test3_autogradOptim()
 
   local fuEval = function(teParam)
     local loss, teGradParams, taCurrWeights = logistic.fuForOptim(teX, teY, teParam)
-    print(taCurrWeights)
+--    print(taCurrWeights)
     taWeightOptim= myUtil.shallowCopy(taCurrWeights)
 --    print(taCurrWeights)
 --    print(loss .. ", ")
     return loss, teGradParams
   end
 
-  local teParamOptim, lossOptim = optim.cg(fuEval, teInitParam, {maxIter = 15})
+  local teParamOptim, lossOptim = optim.cg(fuEval, teInitParam, {maxIter = 25})
 
-  print("taWeightOptim")
-  print(taWeightOptim)
+--  print("taWeightOptim")
+--  print(taWeightOptim)
 
 
   -- verify actual vs. prediction
---  local teYPred = logistic.logisticNew(teX, taWeightOptim)
---  print(torch.add(teY, -teYPred))
+  local teYPred = logistic.logisticNew(teX, taWeightOptim)
+  print(torch.add(teY, -teYPred))
 
 
---  logistic.plotZeros(taWeights, 1,teX:min(), teX:max(), teY:min(), teY:max())
---  logistic.plotZeros(taWeightOptim, 2,teX:min(), teX:max(), teY:min(), teY:max())
+  local xmin, xmax, ymin, ymax = logistic.plotZeros(taWeights, 1)--,teX:min(), teX:max(), teY:min(), teY:max())
+  logistic.plotZeros(taWeightOptim, 2, xmin, xmax, ymin, ymax)--,teX:min(), teX:max(), teY:min(), teY:max())
 
   print("teParamOptim:")
   print(teParamOptim)
