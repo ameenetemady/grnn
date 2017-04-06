@@ -1,4 +1,5 @@
 local autograd = require 'autograd'
+local myUtil = myUtil or require('../MyCommon/util.lua')
 local syngUtil = syngUtil or require('./syngUtil.lua')
 
 local SyngTwoV7 = {}
@@ -28,11 +29,22 @@ do
     return torch.cdiv(teTop,teBut)
 	end
   
-  function  SyngTwoV7.new(weight)
-    weight = weight or torch.rand(7)*2-1
+  function  SyngTwoV7.new(taWeight)
+		local weight = torch.rand(7)*2-1
+		if taWeight ~= nil and taWeight[1] ~= nil then
+			weight = taWeight[1]
+		end
 
     return autograd.nn.AutoModule('SyngTwoV7')(fuSyngTwoV7, weight:clone())
   end
+
+	function SyngTwoV7.getInitWeights_orig(teInputSlice, teTargetSclice, teKOSlice)
+    local teX, teY = syngUtil.getPresent(teInputSlice, teTargetSclice, teKOSlice)
+		local teR = torch.Tensor(7):fill(0)
+		teR[1] = torch.max(teY)
+
+		return {teR}
+	end
 
 	-- ***  getInitWeights related functions (includes optimization): ***
 
@@ -93,7 +105,7 @@ do
 
 			--adding regularization here:
 			--todo: try this with fuLoss2 instead:
-			local dLambda= 0.005
+			local dLambda= 0.00
 			dRes = dRes + dLambda * torch.sum(torch.pow(myParams1, 2)) 
 
 			return dRes
@@ -110,7 +122,7 @@ do
 														 {taWeights.b2}})
 	 
 		-- b) assume const teW and calculate grad for p1, p2
-		local fuGradLoss = grad(SyngTwoV7.fuLoss)
+		local fuGradLoss = autograd(SyngTwoV7.fuLoss)
 		local teGradParams, loss = fuGradLoss(teInitParam, teW, teX, teY)
 
 		return loss, teGradParams, taWeights
@@ -121,7 +133,9 @@ do
     -- filter out the KO records (not useful for training)
     local teX, teY = syngUtil.getPresent(teInputSlice, teTargetSclice, teKOSlice)
 
-  	local teInitParam =  torch.Tensor({-1.5,1.5}) -- torch.rand(2)*2 - 1 
+
+		local dEpsilon = 1e-2
+  	local teInitParam =  torch.Tensor({dEpsilon, dEpsilon}) -- torch.rand(2)*2 - 1 
     
 		local taWeightOptim = nil
 		local fuEval = function(teParam)
@@ -130,11 +144,16 @@ do
 			return loss, teGradParams
 		end
 
-		local teParamOptim, lossOptim = optim.cg(fuEval, teInitParam, {maxIter = 25})
+		local teParamOptim, lossOptim 
+		for i=1, 10 do
+			io.write(".")
+			teParamOptim, lossOptim = optim.sgd(fuEval, teInitParam)
+      teInitParam = teParamOptim
+		end
 
 
-    return torch.Tensor({taWeightOptim.t0, taWeightOptim.t1, taWeightOptim.b1, taWeightOptim.t2, taWeightOptim.b2, 
-									 			 teParamOptim[1], teParamOptim[2] })
+    return { torch.Tensor({taWeightOptim.t0, taWeightOptim.t1, taWeightOptim.b1, taWeightOptim.t2, taWeightOptim.b2, 
+									 			 teParamOptim[1], teParamOptim[2] }) }
   end
 
 	return SyngTwoV7

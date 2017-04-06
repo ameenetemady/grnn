@@ -1,6 +1,8 @@
 local syngUtil = {}
 
 do
+	-- Description: returns two new tensors corresponding to teInputSlice, teTargetSclice only
+	-- 						  keeping the masked ones per teKOSclice
   function syngUtil.getPresent(teInputSlice, teTargetSclice, teKOSlice)
     local tePresent = torch.ByteTensor(teKOSlice:size()):copy(teKOSlice)
 
@@ -10,6 +12,7 @@ do
     return teInputPresent, teTargetPresent
   end
 
+	-- Description: retuns new tensor keeping only the masked elements on the rows specified by teMask
   function syngUtil.getMasked(teX, teMask)
     local teRes = torch.Tensor(teMask:sum(), teX:size(2))
 

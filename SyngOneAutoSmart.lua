@@ -18,8 +18,11 @@ do
     return output
   end
 
-  function  SyngOneAutoSmart.new(weight)
-    weight = weight or torch.rand(4)*2-1
+  function  SyngOneAutoSmart.new(taWeight)
+    local weight = torch.rand(4)*2-1
+		if taWeight ~= nil and taWeight[1] ~= nil then
+			weight = taWeight[1]
+		end
 
     return autograd.nn.AutoModule('AutoSyngOneFullSimple')(fuAutoSyngOneFull, weight:clone())
   end
@@ -27,7 +30,7 @@ do
 
   function SyngOneAutoSmart.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
     if teKOSlice:sum() < 1 then
-      return torch.zeros(4)
+      return {torch.zeros(4)}
     end
 
     -- filter out the KO records (not useful for training)
@@ -59,7 +62,7 @@ do
     local b = teSubWeights[1]
     local c = teSubWeights[2]
 
-    return torch.Tensor({a, b, c, d})
+    return { torch.Tensor({a, b, c, d}) }
   end 
 
   return SyngOneAutoSmart

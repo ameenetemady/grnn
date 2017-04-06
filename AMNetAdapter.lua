@@ -1,4 +1,5 @@
 local AMNetAdapter = AMNetAdapter or torch.class("AMNetAdapter")
+local myUtil = myUtil or require('../MyCommon/util.lua')
 
 --just for testing:
 function AMNetAdapter:test_addToWeights(dAdd)
@@ -15,7 +16,7 @@ end
 function AMNetAdapter:pri_getModelWeights()
   local taWeights = {}
   for k, v in pairs(self.taFu) do
-    taWeights[k] = v.mGx:parameters()[1]
+    taWeights[k] = v.mGx:parameters()
   end
 
   return taWeights
@@ -51,7 +52,7 @@ function AMNetAdapter.pri_cloneWeights(taWeights)
 
   local taWeightsClone = {}
   for k, v in pairs(taWeights) do
-    taWeightsClone[k] = v:clone()
+    myUtil.updateTable(taWeightsClone[k], v)
   end
 
   return taWeightsClone

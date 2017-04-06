@@ -14,6 +14,7 @@ function runExperiment(strExprName, isNoise, taFnnParam)
 
   --load
   local teInput, taTFNames, taKONames = dataLoader:load2dInput()
+
   local teTarget, taTargetNames = dataLoader:loadTarget()
 
   print(string.format("------------------------ Number of samples: %d -------------------", teTarget:size(1)))

@@ -3,7 +3,7 @@ local lSettings = lSettings or require('./lSettings.lua')
 local cDataLoad = cDataLoad or require('../common/cDataLoad.lua')
 local plotUtil = plotUtil or require('../../../MyCommon/plotUtil.lua')
 
-for exprId=3, 3 do
+for exprId=1, 1 do
 
   local strExpName = string.format("d_%d", exprId)
   lfs.mkdir(string.format("figure/%s", strExpName))
@@ -13,6 +13,7 @@ for exprId=3, 3 do
   local taTF = cDataLoad.getData(exprSettings.strTFsNoNoiseFilePath)
 
   print("** " .. strExpName .. " **" )
+	print(exprSettings)
 
 
   -- NonTFs
@@ -42,6 +43,9 @@ for exprId=3, 3 do
   local teX = taTF.teData:narrow(2, 1, 1)
   local teY = taNonTF.teData:narrow(2, 1, 1)
   local teZ = taNonTF.teData:narrow(2, 2, 1)
+
+--	print(taTF.teData)
+--	print(taNonTF.teData)
 
 --  local strExprFigureName = string.format("figure/%s/%s_%s_%s.png", strExpName, taTF.taGenes[1], taNonTF.taGenes[1], taNonTF.taGenes[2])
   local taParam = { xlabel = taTF.taGenes[1], ylabel = taNonTF.taGenes[1], zlabel = taNonTF.taGenes[2], 

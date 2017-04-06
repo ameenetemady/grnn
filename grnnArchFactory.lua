@@ -1,6 +1,7 @@
 local syngTwoAuto = require('./SyngTwoAuto.lua')
 local syngOneAutoSimple = require('./SyngOneAutoSimple.lua')
 local grnnArchUnits = grnnArchUnits or require('./grnnArchUnits.lua')
+local myUtil = myUtil or require('../MyCommon/util.lua')
 
 do
   local archFactory = {}
@@ -145,6 +146,25 @@ do
 
     return mFinalSeq, taFu
   end
+
+	function archFactory.piecewiseLinear1(nInputs, nHidden, taMParameters)
+		local mSeq = nn.Sequential()
+		mSeq:add(nn.Linear(nInputs, nHidden))
+		mSeq:add(nn.ReLU())
+		mSeq:add(nn.Linear(nHidden, 1))
+
+		if taMSeqParameters == nil then
+
+			mSeq:reset(1e-10)
+		end
+
+
+		local taMSeqParameters = mSeq:parameters()
+		myUtil.updateTable(taMSeqParameters, taMParameters, true)
+
+		return mSeq
+
+	end
 
   return archFactory
 end

@@ -20,9 +20,9 @@ do
 
     if taTrainParam.strOptimMethod == "SGD" then
       taTrainParam.taOptimParams = { 
-        learningRate = 0.1,
-        learningRateDecay = 0.9995,
-        momentum = 0.1 }
+        learningRate = 0.05,
+--        learningRateDecay = 0.9995,
+        momentum = 0.5 }
       taTrainParam.fuOptim = optim.sgd
   
     elseif taTrainParam.strOptimMethod == "LBFGS" then
@@ -90,6 +90,15 @@ do
         
         overallErr = overallErr + f
 
+				--[[
+				local teAll = torch.Tensor(gradParameters:size(1), 2)
+				teAll:select(2, 1):copy(gradParameters)
+				teAll:select(2, 2):copy(parameters)
+				print("gradParameters:parameters: ********")
+				print(teAll)
+				print("mse:" .. f)
+				--]]
+
         return f, gradParameters
       end --fuEval
 
@@ -107,10 +116,9 @@ do
   end
 
   function trainerPool.getErr(mNet, teInput, teTarget, taTrainParam)
-    local criterion = taTrainParam.criterion
+    local criterion = taTrainParam.criterion or nn.MSECriterion()
 
     local teOutput = mNet:forward(teInput)
-    local criterion = nn.MSECriterion()
     local fErr = criterion:forward(teOutput, teTarget)
 
     return fErr
@@ -149,22 +157,27 @@ do
 
   function trainerPool.trainGrnnMNetAdapter(mNetAdapter, teInput, teTarget, taTrainerParamsOverride)
     local criterion = nn.MSECriterion()
-    local taTrainParam = trainerPool.getDefaultTrainParams(teInput:size(1),"CG" )
+    local taTrainParam = trainerPool.getDefaultTrainParams(teInput:size(1), taTrainerParamsOverride.strOptimMethod or "CG" )
     myUtil.updateTable(taTrainParam, taTrainerParamsOverride)
 
     local errPrev = math.huge
     local mNetAdapterPrev = nil
     local errCurr = math.huge
 
+		print("optimizing using: " .. taTrainParam.strOptimMethod)
+    local dTmpErr = trainerPool.getErr(mNetAdapter:getRaw(), teInput, teTarget, taTrainParam)
+    print("error before training: " .. dTmpErr)
     for i=1, taTrainParam.nMaxIteration do
       local mNetRaw = mNetAdapter:getRaw()
       errCurr = trainerPool.pri_trainGrnn_SingleRound(mNetRaw, teInput, teTarget, taTrainParam)
 
-      if errPrev <= errCurr or myUtil.isNan(errCurr)  then
+--      if errPrev <= errCurr or myUtil.isNan(errCurr)  then
+      if  myUtil.isNan(errCurr)  then
         print("** early stop **")
         return errPrev, mNetAdapterPrev
       elseif errCurr ~= nil then
         local message = errCurr < errPrev and "<" or "!>"
+				message = message .. errCurr
         myUtil.log(message, false, taTrainParam.isLog)
         errPrev = errCurr
         mNetAdapterPrev = mNetAdapter:clone()

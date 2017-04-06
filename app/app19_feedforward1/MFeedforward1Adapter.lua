@@ -1,7 +1,7 @@
 require('../../requireBaseUnits.lua')
 
-local syngTwoAutoSimpleSmart = syngTwoAutoSimpleSmart or require('../../SyngTwoAutoSimpleSmart.lua')
-local syngOneAutoSmart = syngOneAutoSmart or require('../../SyngOneAutoSmart.lua')
+local mSyngTwo = mSyngTwo or require('../../SyngTwoV7.lua')
+local mSyngOne = mSyngOne or require('../../SyngOneAutoSmart.lua')
 local grnnArchUnits = grnnArchUnits or require('../../grnnArchUnits.lua')
 
 local MFeedforward1Adapter, parent = MFeedforward1Adapter or torch.class("MFeedforward1Adapter", "AMNetAdapter")
@@ -35,19 +35,19 @@ function MFeedforward1Adapter.getNewMNet(taWeights)
   taWeights = taWeights or {}
 
   local fuS1 = function(weight)
-    return syngOneAutoSmart.new(weight)
+    return mSyngOne.new(weight)
   end
 
   local fuS2 = function(weight)
-    return syngTwoAutoSimpleSmart.new(weight)
+    return mSyngTwo.new(weight)
   end
 
   local fuInitS1 = function(teInputSlice, teTargetSclice, teKOSlice)
-    return syngOneAutoSmart.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
+    return mSyngOne.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
   end
 
   local fuInitS2 = function(teInputSlice, teTargetSclice, teKOSlice)
-    return syngTwoAutoSimpleSmart.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
+    return mSyngTwo.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
   end
 
 

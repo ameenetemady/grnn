@@ -50,7 +50,7 @@ function MNetTrainer:trainUnit(strGene)
   local teUnitTarget = self:pri_getGeneSlice(strGene)
 
  -- Create unit to train
-  local nGid = myUtil.findIndexInArray(self.mNetAdapter.taParam.taTargetNames, strGene) -- this is to specify which gene is knocked out
+  local nGid = myUtil.findIndexInArray(self.mNetAdapter.taParam.taTargetNames, strGene) -- this is to specify which gene is knocked out (is this comment correct?!)
   assert(type(nGid) == "number" and nGid > 0, string.format("unExpected nGid:%d !", nGid))
   local mGxClonable = grnnArchUnits.bSeqGx_clonable(nIns, taGeneInfo.fu, nGid, 
                                                     self:pri_getInitWeights(teUnitInput, teUnitTarget, taGeneInfo.fuInit, nGid)) 
@@ -67,7 +67,7 @@ function MNetTrainer:trainUnit(strGene)
   print(string.format("trainUnit: error for %s: %f", strGene, dTestErr))
 
   -- Set Weight
-  self.mNetAdapter:setWeight(strGene, mGxTrained:getRaw():parameters()[1])
+  self.mNetAdapter:setWeight(strGene, mGxTrained:getRaw():parameters())
 end
 
 function MNetTrainer:pri_getInitWeights(teUnitInput, teUnitTarget, fuInit, nGid)
@@ -83,11 +83,23 @@ function MNetTrainer:trainEachUnit()
   end
 
   self.mNetAdapter:reload()
+  
+  
+  local dTestErr = self.taParam.fuTester(self.mNetAdapter:getRaw(), self.taParam.teInput, self.taParam.teTarget)
+  return dTestErr
+end
+
+function MNetTrainer:reload_taWeights()
+  for strGene, taGeneInfo in pairs(self.mNetAdapter.taFu) do
+    self.mNetAdapter:setWeight(strGene, taGeneInfo.mGx:parameters())
+  end
 end
 
 function MNetTrainer:trainTogether()
     local dTrainErr
-    dTrainErr, self.mNetAdapter = self.taParam.fuTrainer(self.mNetAdapter:clone(), self.taParam.teInput, self.taParam.teTarget, self.taParam.taFuTrainerParams)
+    dTrainErr, self.mNetAdapter = self.taParam.fuTrainer(self.mNetAdapter, self.taParam.teInput, self.taParam.teTarget, self.taParam.taFuTrainerParams)
+    
+    self:reload_taWeights()
     return dTrainErr, self.mNetAdapter
 end
 

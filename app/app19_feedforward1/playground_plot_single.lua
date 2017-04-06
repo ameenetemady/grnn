@@ -10,7 +10,8 @@ require("../../MNetTrainer.lua")
 require("../common/CDataLoader.lua")
 
 
-for exprId=1, 5 do
+torch.manualSeed(1)
+for exprId=1, 10 do
 
 
 local strExpName = string.format("d_%d", exprId)
@@ -22,12 +23,14 @@ local dataLoader = CDataLoader.new(exprSettings, false, true, 1.3)
 local teInput, taTFNames, taKONames = dataLoader:load3dInput(exprSettings, false)
 local teTarget, taTargetNames = dataLoader:loadTarget(exprSettings, false)
 
+
 ----[[
 local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 
 local mNetAdapter = MFeedforward1Adapter.new(taNetParam)
 local fuTrainer = trainerPool.trainGrnnMNetAdapter
-local fuTester = testerPool.getMAE
+--local fuTester = testerPool.getMAE
+local fuTester = testerPool.getMSE
 
 local mNet = mNetAdapter:getRaw()
 
@@ -35,12 +38,17 @@ local taMNetTrainerParam = { teInput = teInput,
                              teTarget = teTarget,
                              fuTrainer = fuTrainer,
                              fuTester = fuTester,
-                             taFuTrainerParams = { nMaxIteration = 100}
+                             taFuTrainerParams = { 
+                               nMaxIteration = 10,
+                               --strOptimMethod = "SGD"
+                               }
                            }
 
 local mNetTrainer = MNetTrainer.new(taMNetTrainerParam, mNetAdapter)
 local dErr = nil
-mNetTrainer:trainEachUnit()
+dErr = mNetTrainer:trainEachUnit()
+print("trainEach total error:" .. dErr)
+
 dErr, mNetTrainer.mNetAdapter = mNetTrainer:trainTogether()
 
 dErr = fuTester(mNetTrainer.mNetAdapter:getRaw(), teInput, teTarget)
@@ -48,7 +56,7 @@ print("##############" .. strExpName)
 print(string.format("%d) ######### MSE error:%f",arg[1], dErr))
 
 for k, v in pairs(mNetTrainer.mNetAdapter.taWeights) do
-  print(k, tostring(torch.repeatTensor(v, 1, 1)))
+  print(k, tostring(torch.repeatTensor(v[1], 1, 1)))
 end
 
 local teOutput = mNetTrainer.mNetAdapter:getRaw():forward(teInput)

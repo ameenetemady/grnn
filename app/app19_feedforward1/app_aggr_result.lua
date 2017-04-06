@@ -5,10 +5,11 @@ local taSet = {
 ----[[
   { strFormat= "result/grnn_d_%s.table",
     taFields = { "dTrainErr", "taTestResult"},
-    nMaxId = 100 },
+    nMaxId = 1 },
     { strFormat= "result/fnn_nh0_nnpl4_d_%s.table",
     taFields = { "dTrainErr", "taTestResult"},
-    nMaxId = 100},
+    nMaxId = 1},
+		--[[
   { strFormat= "result/fnn_nh1_nnpl4_d_%s.table",
     taFields = { "dTrainErr", "taTestResult"},
     nMaxId = 100},
@@ -19,7 +20,7 @@ local taSet = {
     taFields = { "dTrainErr", "taTestResult"},
     nMaxId = 100},
 --    --[[,
-----[[
+--[[
   { strFormat= "result/grnn_d_%s_noise.table",
     taFields = { "dTrainErr", "taTestResult"},
     nMaxId = 100 },
