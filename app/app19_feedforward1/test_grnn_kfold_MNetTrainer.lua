@@ -7,10 +7,11 @@ require('../../FoldRunMNetTrainer.lua')
 require('../../KFoldRunner.lua')
 require('./MFeedforward1Adapter.lua')
 require("../common/CDataLoader.lua")
+torch.manualSeed(1)
 
 function runExperiment(strExprName, isNoise)
   local exprSettings = lSettings.getExprSetting(strExprName)
-  local dataLoader = CDataLoader.new(exprSettings, isNoise, true)
+  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 0.5)
   local teInput, taTFNames, taKONames = dataLoader:load3dInput()
   local teTarget, taTargetNames = dataLoader:loadTarget()
 
@@ -21,13 +22,14 @@ function runExperiment(strExprName, isNoise)
   end
 
   local taParam = { 
-    nFolds = 10, --10
+    nFolds = 5, --10
     teInput = teInput, 
     teTarget = teTarget, 
     mNetAdapter = MFeedforward1Adapter.new(taNetParam),
     fuTrainer = trainerPool.trainGrnnMNetAdapter,
-    taFuTrainerParams = { nMaxIteration = 20},--10
-    fuTester = testerPool.getMAE}
+    taFuTrainerParams = { nMaxIteration = 10, strOptimMethod = "CG"},--10
+    --taFuTrainerParams = { nMaxIteration = 500, strOptimMethod = "SGD"},--10
+    fuTester = testerPool.getMSE}
 
     local kFoldRunner = KFoldRunner.new(taParam, fuFoldRunFactory)
     while kFoldRunner:hasMore() do
@@ -46,7 +48,7 @@ end
 
 
 local isNoise = myUtil.getBoolFromStr(arg[1])
-local nMaxExprId = 10 --100
+local nMaxExprId = 20 --100
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))

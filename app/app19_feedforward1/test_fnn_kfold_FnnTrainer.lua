@@ -10,7 +10,7 @@ require('../common/CDataLoader.lua')
 
 function runExperiment(strExprName, isNoise, taFnnParam)
   local exprSettings = lSettings.getExprSetting(strExprName)
-  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 1.3)
+  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 0.5)
 
   --load
   local teInput, taTFNames, taKONames = dataLoader:load2dInput()
@@ -30,14 +30,14 @@ function runExperiment(strExprName, isNoise, taFnnParam)
   end
 
   local taParam = { 
-    nFolds = 10, -- 10
-    nSeeds = 5, --10
+    nFolds = 5, -- 10
+    nSeeds = 2, --10
     teInput = teInput, 
     teTarget = teTarget, 
     mNetAdapter = FnnAdapter.new(taArchParam),
     fuTrainer = trainerPool.trainGrnnMNetAdapter,
-    taFuTrainerParams = { nMaxIteration = 20}, --200
-    fuTester = testerPool.getMAE }
+    taFuTrainerParams = { nMaxIteration = 10}, --200
+    fuTester = testerPool.getMSE }
 
     local kFoldRunner = KFoldRunner.new(taParam, fuFoldRunFactory)
     while kFoldRunner:hasMore() do
@@ -61,7 +61,7 @@ local nHiddenLayers = arg[2] == nil and 0 or tonumber(arg[2])
 
 local taFnnParam = { nNodesPerLayer = 4, 
                      nHiddenLayers = nHiddenLayers  }
-local nMaxExprId = 10 --100
+local nMaxExprId = 20 --100
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))

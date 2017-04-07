@@ -22,7 +22,7 @@ do
     local taSummary = {}
     for k, taV in pairs(taAggrData) do
       local teData = torch.Tensor(taV)
-      taSummary[k] = { mean = teData:mean(), std = teData:std() }
+      taSummary[k] = { median = torch.median(teData):squeeze(), std = teData:std() }
     end
 
     return taSummary
@@ -43,6 +43,38 @@ do
 
     return taSummary
   end
+  
+  function aggr_result.printGroupSummary(taGroup, nMinId, nMaxId, strMetricProperty)
+    print("********" .. taGroup.name .. "********" )
+    for i=nMinId, nMaxId do
+      print("d_" .. i)
+      local strFilename = string.format(taGroup.strFilePattern, i)
+      local taCurrData = torch.load(strFilename, "ascii")
+      for k, v in pairs(taCurrData) do
+        local dValue = v[strMetricProperty]
+        if dValue > 1 then
+          print("!!" .. dValue .. "!!")
+        else
+          print(dValue)
+        end
+
+        
+      end
+      
+
+    end
+  end
+  
+  function aggr_result.printFullSummary(taBenchMark)
+    for k, v in pairs(taBenchMark.taGroups) do
+        aggr_result.printGroupSummary(v, 
+                                      taBenchMark.nMinId, taBenchMark.nMaxId, 
+                                      taBenchMark.strMetricProperty)
+    end
+  
+  end
 
   return aggr_result
 end
+
+
