@@ -26,7 +26,8 @@ do
                                       torch.mul(teH2, b2)),
                             1)
 
-    return torch.cdiv(teTop,teBut)
+		local teR = torch.cdiv(teTop,teBut)
+		return teR
 	end
   
   function  SyngTwoV7.new(taWeight)
@@ -147,6 +148,7 @@ do
 		local teParamOptim, lossOptim 
 		for i=1, 10 do
 			io.write(".")
+			-- ToDo: find correct parameters
 			teParamOptim, lossOptim = optim.sgd(fuEval, teInitParam)
       teInitParam = teParamOptim
 		end

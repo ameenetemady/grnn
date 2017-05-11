@@ -1,7 +1,9 @@
 require('../../requireBaseUnits.lua')
 
-local mSyngTwo = mSyngTwo or require('../../SyngTwoV7.lua')
-local mSyngOne = mSyngOne or require('../../SyngOneAutoSmart.lua')
+local mSyngTwo = mSyngTwo or require('../../SyngV7.lua')
+local mSyngOne =  mSyngTwo
+--local mSyngTwo = mSyngTwo or require('../../SyngTwoV7.lua')
+--local mSyngOne = mSyngOne or require('../../SyngOneAutoSmart.lua')
 local grnnArchUnits = grnnArchUnits or require('../../grnnArchUnits.lua')
 
 local MFeedforward1Adapter, parent = MFeedforward1Adapter or torch.class("MFeedforward1Adapter", "AMNetAdapter")
