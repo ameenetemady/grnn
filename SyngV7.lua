@@ -1,6 +1,7 @@
 local autograd = require 'autograd'
 local myUtil = myUtil or require('../MyCommon/util.lua')
 local syngUtil = syngUtil or require('./syngUtil.lua')
+local gurobiW = require('./gurobiWrap.lua')
 
 local SyngV7 = {}
 
@@ -28,6 +29,11 @@ do
 		local teR = torch.view(torch.cdiv(teTop, teBut), nM, 1)
 
 		return teR
+	end
+
+	function SyngV7.getMSE(teX, teTheta, teY)
+		local teYPred = fuSyngV7(teX, teTheta)
+		return torch.dist(teY, teYPred)
 	end
 
   function  SyngV7.new(taWeight)
@@ -59,9 +65,15 @@ do
 													 torch.mul(teYH, -1)})
 
 		-- c) construct B
-		local teB = torch.Tensor(nM, 1)
-		teB:select(2, 1):copy(teY)
-		local teW = torch.gels(teB, teA):squeeze()
+		local teB = torch.Tensor(nM) -- Note: 2d if real gels used
+		teB:copy(teY)
+		
+--		local teW = torch.gels(teB, teA):squeeze() --ToDo: remove this, it's  old Line when using actual gels
+		local nLStart = teA:size(2) - nD
+		local status, teW = gurobiW.gelsNonNegative(teA, teB, nLStart, nD)
+		if status ~= 2 then
+			io.write(string.format(" !!! status:%d !!!! ", status))
+		end
 
 		return teW
 	end
@@ -115,9 +127,8 @@ do
 
 	function SyngV7.getInitWeights(teInputSlice, teTargetSclice, teKOSlice) -- ToDo: test
     local teX, teY = syngUtil.getPresent(teInputSlice, teTargetSclice, teKOSlice)
-		local dEpsilon = 1e-2
 		local nD = teX:size(2)
-  	local teInitParam =  torch.Tensor(nD):fill(dEpsilon)
+
 
 		local teWeightOptim = nil
 		local fuEval = function(teParam)
@@ -126,15 +137,29 @@ do
 			return loss, teGradParams
 		end
 
-		local teParamOptim, lossOptim 
-		for i=1, 100 do
-			io.write(".")
-			teParamOptim, lossOptim = optim.sgd(fuEval, teInitParam)
-      teInitParam = teParamOptim
-		end
---		print(lossOptim)
+		-- OuterLoop for multiple initializations
+		local nRounds = 20
+		local teBestTheta = torch.Tensor(nD*3+1)
+		local dBestErr = math.huge
+		for r=1, nRounds do
 
-		return { torch.cat(teWeightOptim, teParamOptim, 1) }
+			local teInitParam =  (torch.rand(nD) - 0.5) 
+			local teParamOptim, lossOptim 
+			for i=1, 2 do
+				teParamOptim, lossOptim = optim.cg(fuEval, teInitParam)
+				teInitParam = teParamOptim
+			end
+			local teCurrTheta = torch.cat(teWeightOptim, teParamOptim, 1)
+
+			local dCurrErr = SyngV7.getMSE(teX, teCurrTheta, teY)
+			if dCurrErr < dBestErr then
+				io.write(string.format("(%f).", dCurrErr))
+				dBestErr = dCurrErr
+				teBestTheta:copy(teCurrTheta)
+			end
+		end
+
+		return { teBestTheta }
 	end
 
 	return SyngV7

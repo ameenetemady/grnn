@@ -31,12 +31,12 @@ function runExperiment(strExprName, isNoise, taFnnParam)
 
   local taParam = { 
     nFolds = 5, -- 10
-    nSeeds = 2, --10
+    nSeeds = 5, --10
     teInput = teInput, 
     teTarget = teTarget, 
     mNetAdapter = FnnAdapter.new(taArchParam),
     fuTrainer = trainerPool.trainGrnnMNetAdapter,
-    taFuTrainerParams = { nMaxIteration = 10}, --200
+    taFuTrainerParams = { nMaxIteration = 20}, --200
     fuTester = testerPool.getMSE }
 
     local kFoldRunner = KFoldRunner.new(taParam, fuFoldRunFactory)

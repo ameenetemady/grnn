@@ -21,7 +21,7 @@ end
 
 function test2_getInitWeights()
 	 local synthWeight = torch.Tensor({1, 1, 3, 0.5, 0.5, 1, 3})
-  local nSize = 500
+  local nSize = 50
 
   local teInput, teTarget = genData1(synthWeight, nSize)
 	local teKOSlice = torch.ones(teInput:size(1), 1)
