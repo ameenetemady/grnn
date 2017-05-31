@@ -10,7 +10,7 @@ require('../common/CDataLoader.lua')
 
 function runExperiment(strExprName, isNoise, taFnnParam)
   local exprSettings = lSettings.getExprSetting(strExprName)
-  local dataLoader = CDataLoader.new(exprSettings, isNoise, true)
+  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 1.5)
 
   --load
   local teInput, taTFNames, taKONames = dataLoader:load2dInput()
@@ -62,7 +62,7 @@ local nHiddenLayers = arg[2] == nil and 0 or tonumber(arg[2])
 
 local taFnnParam = { nNodesPerLayer = 4, 
                      nHiddenLayers = nHiddenLayers  }
-local nMaxExprId = 10 --100
+local nMaxExprId = 3 --100
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))

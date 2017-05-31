@@ -11,7 +11,7 @@ torch.manualSeed(1)
 
 function runExperiment(strExprName, isNoise)
   local exprSettings = lSettings.getExprSetting(strExprName)
-  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 0.5)
+  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 1)
   local teInput, taTFNames, taKONames = dataLoader:load3dInput()
   local teTarget, taTargetNames = dataLoader:loadTarget()
 
@@ -22,7 +22,7 @@ function runExperiment(strExprName, isNoise)
   end
 
   local taParam = { 
-    nFolds = 5, --10
+    nFolds = 2, --10
     teInput = teInput, 
     teTarget = teTarget, 
     mNetAdapter = MFeedforward1Adapter.new(taNetParam),
@@ -48,7 +48,7 @@ end
 
 
 local isNoise = myUtil.getBoolFromStr(arg[1])
-local nMaxExprId = 20 --100
+local nMaxExprId = 20 --20
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))

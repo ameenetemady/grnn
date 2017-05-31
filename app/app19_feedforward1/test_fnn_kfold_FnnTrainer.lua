@@ -10,7 +10,7 @@ require('../common/CDataLoader.lua')
 
 function runExperiment(strExprName, isNoise, taFnnParam)
   local exprSettings = lSettings.getExprSetting(strExprName)
-  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 0.5)
+  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 1.0)
 
   --load
   local teInput, taTFNames, taKONames = dataLoader:load2dInput()
@@ -30,7 +30,7 @@ function runExperiment(strExprName, isNoise, taFnnParam)
   end
 
   local taParam = { 
-    nFolds = 5, -- 10
+    nFolds = 2, -- 10
     nSeeds = 5, --10
     teInput = teInput, 
     teTarget = teTarget, 

@@ -64,6 +64,23 @@ do
 
     end
   end
+
+
+  function aggr_result.printGroupSummaryForFigure(taGroup, nMinId, nMaxId, strMetricProperty)
+    for i=nMinId, nMaxId do
+      local strFilename = string.format(taGroup.strFilePattern, i)
+      local taCurrData = torch.load(strFilename, "ascii")
+      for k, v in pairs(taCurrData) do
+      	local dValue = v[strMetricProperty]
+				local strDatastName = string.format("d_%d_%d", i, k)
+				print(string.format("dfSummary[nrow(dfSummary) + 1,] <- c(\"%s\", %f, \"%s\", 0.0, 0.0)", taGroup.name , dValue, strDatastName ))
+       end
+
+        
+     end
+      
+  end
+
   
   function aggr_result.printFullSummary(taBenchMark)
     for k, v in pairs(taBenchMark.taGroups) do
@@ -73,6 +90,16 @@ do
     end
   
   end
+
+  function aggr_result.printFullSummaryForFigure(taBenchMark)
+    for k, v in pairs(taBenchMark.taGroups) do
+        aggr_result.printGroupSummaryForFigure(v, 
+                                      taBenchMark.nMinId, taBenchMark.nMaxId, 
+                                      taBenchMark.strMetricProperty)
+    end
+  
+  end
+
 
   return aggr_result
 end

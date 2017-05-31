@@ -11,7 +11,7 @@ require("../common/CDataLoader.lua")
 
 
 torch.manualSeed(1)
-for exprId=1, 10 do
+for exprId=4, 10 do
 
 
 local strExpName = string.format("d_%d", exprId)
