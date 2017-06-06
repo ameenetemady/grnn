@@ -33,7 +33,7 @@ local taSet = {
     nMaxId = 20 },
   { strFormat= "result/fnn_nh2_nnpl4_d_%s_noise.table",
     taFields = { "dTrainErr", "taTestResult"},
-    nMaxId = 10 },
+    nMaxId = 20 },
 
 		--[[
   { strFormat= "result/fnn_nh3_nnpl4_d_%s_noise.table",

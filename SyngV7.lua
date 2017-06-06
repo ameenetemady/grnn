@@ -138,10 +138,12 @@ do
 		end
 
 		-- OuterLoop for multiple initializations
-		local nRounds = 20
+		local nMaxRounds = 50
 		local teBestTheta = torch.Tensor(nD*3+1)
 		local dBestErr = math.huge
-		for r=1, nRounds do
+      local dGoodEnoughErr = teY:max() * teY:nElement() /50
+
+		for r=1, nMaxRounds do
 
 			local teInitParam =  (torch.rand(nD) - 0.5) 
 			local teParamOptim, lossOptim 
@@ -157,6 +159,13 @@ do
 				dBestErr = dCurrErr
 				teBestTheta:copy(teCurrTheta)
 			end
+
+         -- Early Stop Criteria
+         if dBestErr < dGoodEnoughErr then
+            io.write(" *^* ")
+            break
+         end
+
 		end
 
 		return { teBestTheta }

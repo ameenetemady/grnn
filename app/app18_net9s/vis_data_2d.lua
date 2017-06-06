@@ -14,7 +14,7 @@ local strExpName = string.format("d_%d", exprId)
 lfs.mkdir(string.format("figure/%s", strExpName))
 
 local exprSettings = lSettings.getExprSetting(strExpName)
-local dataLoader = CDataLoader.new(exprSettings, false, true, 0.20)
+local dataLoader = CDataLoader.new(exprSettings, false, true, 0.000)
 
 local teInput, taTFNames, taKONames = dataLoader:load3dInput(exprSettings, false)
 local teTarget, taTargetNames = dataLoader:loadTarget(exprSettings, false)
@@ -35,12 +35,13 @@ print("nRrows: " .. teTarget:size(1))
   plotUtil.plot2d(teTargetX, teTargetY, taParam)
 
 
-  -- TF
-
+  --[[ TF
     for yId=1, 2 do
       local teTargetX = teTarget:narrow(2, yId, 1)
 
+      print( "*".. yId .."*")
       local teInputX = teInput:select(3,1)
+      print(teInputX)
 
       local strExprFigureName = string.format("figure/%s/%d_new_%s_%s.png", strExpName, arg[1], taTFNames[1], taTargetNames[yId])
       local taParam = { xlabel = taTFNames[1], ylabel = taTargetNames[yId], title = "", strFigureFilename = strExprFigureName }

@@ -10,7 +10,7 @@ require('../common/CDataLoader.lua')
 
 function runExperiment(strExprName, isNoise, taFnnParam)
   local exprSettings = lSettings.getExprSetting(strExprName)
-  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 1.0)
+  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 0.01)
 
   --load
   local teInput, taTFNames, taKONames = dataLoader:load2dInput()

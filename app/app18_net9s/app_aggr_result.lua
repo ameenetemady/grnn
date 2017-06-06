@@ -16,24 +16,26 @@ local taSet = {
   { strFormat= "result/fnn_nh2_nnpl4_d_%s.table",
     taFields = { "dTrainErr", "taTestResult"},
     nMaxId = 20},
-	 --[[	
+--	 --[[	
   { strFormat= "result/fnn_nh3_nnpl4_d_%s.table",
     taFields = { "dTrainErr", "taTestResult"},
-    nMaxId = 100},
+    nMaxId = 20},
 		--]]
   { strFormat= "result/grnn_d_%s_noise.table",
     taFields = { "dTrainErr", "taTestResult"},
-    nMaxId = 3 },
+    nMaxId = 20 },
   { strFormat= "result/fnn_nh0_nnpl4_d_%s_noise.table",
     taFields = { "dTrainErr", "taTestResult"},
-    nMaxId = 3 },
-
+    nMaxId = 20 },
   { strFormat= "result/fnn_nh1_nnpl4_d_%s_noise.table",
     taFields = { "dTrainErr", "taTestResult"},
-    nMaxId = 3 },
+    nMaxId = 20 },
   { strFormat= "result/fnn_nh2_nnpl4_d_%s_noise.table",
     taFields = { "dTrainErr", "taTestResult"},
-    nMaxId = 3 },
+    nMaxId = 20 },
+  { strFormat= "result/fnn_nh3_nnpl4_d_%s_noise.table",
+    taFields = { "dTrainErr", "taTestResult"},
+    nMaxId = 20 },
 
 --[[
 		
@@ -49,6 +51,7 @@ for k, v in pairs(taSet) do
   local taSummary = aggr_result.getAggrSummary(v)
   
   print( 
+        string.format("(%.8f)", taSummary.taTestResult.mean) ..
         string.format("%.8f", taSummary.taTestResult.median) .. "±" ..
         string.format("%.8f", taSummary.taTestResult.std) .. "|" ..
         string.format(v.strFormat, "*"))
@@ -76,9 +79,9 @@ local taBenchMark = {
               strFilePattern = "result/fnn_nh1_nnpl4_d_%s_noise.table"},
           },
           nMinId = 1,
-          nMaxId = 3,
+          nMaxId = 20,
           strMetricProperty = "taTestResult",
       }
---aggr_result.printFullSummary(taBenchMark)
-aggr_result.printFullSummaryForFigure(taBenchMark)
+aggr_result.printFullSummary(taBenchMark)
+--aggr_result.printFullSummaryForFigure(taBenchMark)
 --]]

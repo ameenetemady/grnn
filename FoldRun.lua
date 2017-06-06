@@ -42,6 +42,7 @@ end
 
 function FoldRun:getSummaryTable()
   return {dTrainErr = self.dTrainErr,
-          taTestResult = self.taTestResult}
+          taTestResult = self.taTestResult,
+          nRows = self.taTrain[1]:size(1) + self.taTest[1]:size(1)}
 
 end

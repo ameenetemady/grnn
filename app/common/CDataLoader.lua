@@ -20,21 +20,39 @@ function CDataLoader:pri_loadAllCat()
     local taNonTFs = cDataLoad.getData(strNonTFFilepath)
 
     return torch.cat({taTFs.teData, taNonTFs.teData, taKOs.teData}, 2)
+--    return taNonTFs.teData
 end
 
+-- Description: Perfoms PCA and uses PC1 values for creating balanced samples given dMinDist
 function CDataLoader:pri_getBalancedIdx(teDataCat)
-    local nRowsTotal = teDataCat:size(1)
-    
+
+   print("******")
+   local dEpsilon = 1e-10
+   local teD = teDataCat:clone()
+   local nRows = teD:size(1)
+   local nCols = teD:size(2)
+   teD = teD - teD:mean(1):expandAs(teD) -- centralize
+   teDStd = teD:std(1):expandAs(teD) + dEpsilon -- standardize (add epsilon to avoid possible devision by zero)
+   teD = teD:cdiv(teDStd)
+
+   local teM = torch.mm(teD:t(), teD)
+   teM:div(nRows-1)
+
+   local teMe, teMV = torch.symeig(teM, 'V')
+
+   local tePC1 = teD*teMV:select(2, nCols)
+   local y, idxSort = torch.sort(tePC1, 1, true)
+   idxSort = idxSort:squeeze()
+
     local taIdx = {}
-    table.insert(taIdx, 1)
-    local nLastAddedId = 1
-    for i=2, nRowsTotal do
-      local dDist = torch.dist(teDataCat:select(1, nLastAddedId), 
-                                teDataCat:select(1, i))
+    table.insert(taIdx, idxSort[1])
+    local nLastAddedId = idxSort[1]
+    for i=2, nRows do
+      local dDist = tePC1[nLastAddedId] - tePC1[idxSort[i]]
 
       if dDist > self.dMinDist then
-        table.insert(taIdx, i)
-        nLastAddedId = i
+        table.insert(taIdx, idxSort[i])
+        nLastAddedId = idxSort[i]
       end
     end
 

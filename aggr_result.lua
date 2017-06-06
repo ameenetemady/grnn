@@ -22,7 +22,9 @@ do
     local taSummary = {}
     for k, taV in pairs(taAggrData) do
       local teData = torch.Tensor(taV)
-      taSummary[k] = { median = torch.median(teData):squeeze(), std = teData:std() }
+      taSummary[k] = {  mean = torch.mean(teData),
+                        median = torch.median(teData):squeeze(), 
+                        std = teData:std() }
     end
 
     return taSummary

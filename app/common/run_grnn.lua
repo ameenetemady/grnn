@@ -1,19 +1,22 @@
 local testerPool = testerPool or require('../../../MyCommon/testerPool.lua')
 local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')
-local lSettings = lSettings or require('./lSettings.lua')
+local lSettings = lSettings or require('lSettings.lua')
 local myUtil = myUtil or require('../../../MyCommon/util.lua')
 require('../../FoldRun.lua')
 require('../../FoldRunMNetTrainer.lua')
 require('../../KFoldRunner.lua')
-require('./MFeedforward1Adapter.lua')
-require("../common/CDataLoader.lua")
-torch.manualSeed(1)
+require('../common/CDataLoader.lua')
 
-function runExperiment(strExprName, isNoise)
+function runExperiment(strExprName, isNoise, dMinDist)
   local exprSettings = lSettings.getExprSetting(strExprName)
-  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 0.01)
+  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, dMinDist)
+
   local teInput, taTFNames, taKONames = dataLoader:load3dInput()
   local teTarget, taTargetNames = dataLoader:loadTarget()
+
+  local nRows = teTarget:size(1)
+  print(string.format("Number of rows: %d *************************", nRows))
+
 
   local taNetParam = { taTFNames = taTFNames, taKONames = taKONames, taTargetNames = taTargetNames }
 
@@ -22,13 +25,12 @@ function runExperiment(strExprName, isNoise)
   end
 
   local taParam = { 
-    nFolds = 2, --10
+    nFolds = 5, --10
     teInput = teInput, 
     teTarget = teTarget, 
-    mNetAdapter = MFeedforward1Adapter.new(taNetParam),
+    mNetAdapter = lSettings.getNewMNet(taNetParam),
     fuTrainer = trainerPool.trainGrnnMNetAdapter,
     taFuTrainerParams = { nMaxIteration = 10, strOptimMethod = "CG"},--10
-    --taFuTrainerParams = { nMaxIteration = 500, strOptimMethod = "SGD"},--10
     fuTester = testerPool.getMSE}
 
     local kFoldRunner = KFoldRunner.new(taParam, fuFoldRunFactory)
@@ -41,20 +43,21 @@ function runExperiment(strExprName, isNoise)
   return kFoldRunner:getAggrSummaryTable()
 end
 
-function getResultFilename(strExprName, isNoise)
+function getResultFilename(strExprName, isNoise, dMinDist)
   local strNoise = isNoise and "_noise" or ""
-  return string.format("result/grnn_%s%s.table", strExprName, strNoise)
+  return string.format("result/grnn_%s%s_%.3f.table", strExprName, strNoise, dMinDist)
 end
 
-
 local isNoise = myUtil.getBoolFromStr(arg[1])
-local nMaxExprId = 20 --20
+local dMinDist = arg[2] == nil and 1 or tonumber(arg[2])
+
+local nMaxExprId = 20 --100
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))
 
-  local taExprResult = runExperiment(strExprName, isNoise)
-  local strResultFilename = getResultFilename(strExprName, isNoise)
+  local taExprResult = runExperiment(strExprName, isNoise, dMinDist)
+  local strResultFilename = getResultFilename(strExprName, isNoise, dMinDist)
   torch.save(strResultFilename, taExprResult, "ascii")
 end
 

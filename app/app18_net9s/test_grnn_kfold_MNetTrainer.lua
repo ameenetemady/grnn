@@ -10,7 +10,8 @@ require('../common/CDataLoader.lua')
 
 function runExperiment(strExprName, isNoise)
   local exprSettings = lSettings.getExprSetting(strExprName)
-  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 1.2) -- 1 is used when noise
+  local dDist = 0.3
+  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, dDist)
 
   local teInput, taTFNames, taKONames = dataLoader:load3dInput()
   local teTarget, taTargetNames = dataLoader:loadTarget()
@@ -51,7 +52,7 @@ end
 
 
 local isNoise = myUtil.getBoolFromStr(arg[1])
-local nMaxExprId = 3 --100
+local nMaxExprId = 20 --100
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))

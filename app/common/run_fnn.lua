@@ -1,6 +1,6 @@
 local testerPool = testerPool or require('../../../MyCommon/testerPool.lua')
 local trainerPool = trainerPool or require('../../grnnTrainerPool.lua')
-local lSettings = lSettings or require('./lSettings.lua')
+local lSettings = lSettings or require('lSettings.lua')
 local myUtil = myUtil or require('../../../MyCommon/util.lua')
 require('../../FoldRun.lua')
 require('../../FoldRunFnnTrainer.lua')
@@ -8,9 +8,9 @@ require('../../KFoldRunner.lua')
 require('../../FnnAdapter.lua')
 require('../common/CDataLoader.lua')
 
-function runExperiment(strExprName, isNoise, taFnnParam)
+function runExperiment(strExprName, isNoise, taFnnParam, dMinDist)
   local exprSettings = lSettings.getExprSetting(strExprName)
-  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, 1.5)
+  local dataLoader = CDataLoader.new(exprSettings, isNoise, true, dMinDist)
 
   --load
   local teInput, taTFNames, taKONames = dataLoader:load2dInput()
@@ -32,7 +32,7 @@ function runExperiment(strExprName, isNoise, taFnnParam)
 
   local taParam = { 
     nFolds = 5, -- 10
-    nSeeds = 5, --10
+    nSeeds = 10, --10
     teInput = teInput, 
     teTarget = teTarget, 
     mNetAdapter = FnnAdapter.new(taArchParam),
@@ -50,25 +50,26 @@ function runExperiment(strExprName, isNoise, taFnnParam)
   return kFoldRunner:getAggrSummaryTable()
 end
 
-function getResultFilename(taFnnParam, strExprName, isNoise)
+function getResultFilename(taFnnParam, strExprName, isNoise, dMinDist)
   local strNoise = isNoise and "_noise" or ""
-  return string.format("result/fnn_nh%d_nnpl%d_%s%s.table", 
-                                          taFnnParam.nHiddenLayers, taFnnParam.nNodesPerLayer, strExprName, strNoise)
+  return string.format("result/fnn_nh%d_nnpl%d_%s%s_%.3f.table", 
+                                          taFnnParam.nHiddenLayers, taFnnParam.nNodesPerLayer, strExprName, strNoise, dMinDist)
 
 end
 
 local isNoise = myUtil.getBoolFromStr(arg[1])
 local nHiddenLayers = arg[2] == nil and 0 or tonumber(arg[2])
+local dMinDist = arg[3] == nil and 1 or tonumber(arg[3])
 
 local taFnnParam = { nNodesPerLayer = 4, 
                      nHiddenLayers = nHiddenLayers  }
-local nMaxExprId = 3 --100
+local nMaxExprId = 20 --100
 for nExprId=1, nMaxExprId do
   local strExprName = string.format("d_%d", nExprId)
   print(string.format("********** Experiemnt %s ***********", strExprName))
 
-  local taExprResult = runExperiment(strExprName, isNoise, taFnnParam)
-  local strResultFilename = getResultFilename(taFnnParam, strExprName, isNoise)
+  local taExprResult = runExperiment(strExprName, isNoise, taFnnParam, dMinDist)
+  local strResultFilename = getResultFilename(taFnnParam, strExprName, isNoise, dMinDist)
 
   torch.save(strResultFilename, taExprResult, "ascii")
 end

@@ -3,7 +3,6 @@ local cDataLoad = {}
 
 do
   function cDataLoad.getData(strFilePath)
-    print(strFilePath)
 
     local taGenes = dataLoad.getHeader(strFilePath)
     local taLoadParam = { strFilename = strFilePath, nCols = table.getn(taGenes), taCols = taGenes, isHeader = true }
