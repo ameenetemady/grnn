@@ -1,10 +1,19 @@
 local gurobi = require 'gurobi'
 do
 	local gurobiWrap = {}
+	
+	-- metatable, used for final cleanup, *** this requires lua 5.2
+	gurobiWrap.mt = { 
+                env =  gurobi.loadenv(""),
+                __gc = function(self) 
+		        gurobi.free(self.mt.env, nil)
+                       end
+		}
+	setmetatable(gurobiWrap, gurobiWrap.mt)
 
 	-- Description, solves Aw = y constrained with  nLStart, nLLength to define the weights (w) to be nonnegative
 	function gurobiWrap.gelsNonNegative(teA, teY, nLStart, nLLength)
-		local env = gurobi.loadenv("")
+		--local env = gurobi.loadenv("")
 
 		local nD = teA:size(2)
 		local nM = teA:size(1)
@@ -23,14 +32,14 @@ do
 
 		teLB:narrow(1, nD + 1, nM * 2):fill(0)
 
-		local model = gurobi.newmodel(env, "", teC, teLB)
+		local model = gurobi.newmodel(gurobiWrap.mt.env, "", teC, teLB)
 		gurobi.addconstrs(model, teG, 'EQ', teY)
 
 		-- solve
 		local status, teW = gurobi.solve(model)
 
 		local teWCopy = teW:narrow(1, 1, nD):clone()
-		gurobi.free(env, model)
+		gurobi.free(nil, model)
 
 		return status, teWCopy
 	end

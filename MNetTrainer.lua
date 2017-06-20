@@ -8,7 +8,7 @@ local myUtil = myUtil or require("../MyCommon/util.lua")
 
 function MNetTrainer:__init(taParam, mNetAdapter)
   self.taParam = taParam
-  self.nTargets = table.getn(mNetAdapter.taParam.taTargetNames)
+  self.nTargets = #mNetAdapter.taParam.taTargetNames
   self.mNetAdapter = mNetAdapter
 end
 
@@ -31,7 +31,7 @@ end
 
 function MNetTrainer:trainUnit(strGene)
   local taGeneInfo = self.mNetAdapter.taFu[strGene]
-  local nIns = table.getn(taGeneInfo.taIn)
+  local nIns = #taGeneInfo.taIn
 
     -- Create input
   local nRows = self.taParam.teInput:size(1)

@@ -145,7 +145,7 @@ do
 
 		for r=1, nMaxRounds do
 
-			local teInitParam =  (torch.rand(nD) - 0.5) 
+			local teInitParam =  r>1 and (torch.rand(nD)*2 - 1) or torch.zeros(nD)
 			local teParamOptim, lossOptim 
 			for i=1, 2 do
 				teParamOptim, lossOptim = optim.cg(fuEval, teInitParam)

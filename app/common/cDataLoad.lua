@@ -5,7 +5,7 @@ do
   function cDataLoad.getData(strFilePath)
 
     local taGenes = dataLoad.getHeader(strFilePath)
-    local taLoadParam = { strFilename = strFilePath, nCols = table.getn(taGenes), taCols = taGenes, isHeader = true }
+    local taLoadParam = { strFilename = strFilePath, nCols = #taGenes, taCols = taGenes, isHeader = true }
     local teData = dataLoad.loadTensorFromTsv(taLoadParam)
 
     return { taGenes = taGenes, teData = teData }

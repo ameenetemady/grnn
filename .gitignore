@@ -1,3 +1,4 @@
+slurm*.out
 *.table
 *.png
 app/app10_cascadeB/cascadeB.pdf
