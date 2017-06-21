@@ -17,6 +17,10 @@ do
   end
 
   function  SyngOneAutoSimple.new(weight)
+    if type(weight) == "table" then
+       weight = weight[1]
+    end
+
     weight = weight or torch.rand(4)*2-1
 
     return autograd.nn.AutoModule('AutoSyngOneFullSimple')(fuAutoSyngOneFull, weight:clone())

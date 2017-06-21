@@ -56,7 +56,12 @@ do
     return mRes
   end
 
-  function grnnArchUnits.aGx(nfArgs, fu, nGid, nNonTFs, nTFid, teWeight)
+-- Input(nfArgs): is the umber of args for this gene
+-- Input(fu): initialization function
+-- Input(nGid): is the nonTF (that would be knocked out if 0)
+-- Input(nTFid): is the column id for the first arg for this gene
+-- Input(nNonTFs): total number of nonTF gense (constant in the network)
+  function grnnArchUnits.aGx(nfArgs, fu, nGid, nNonTFs, nTFid, teWeight) 
     local mRes = nn.Sequential()
     mRes:add(nn.Narrow(2, nTFid, nfArgs))
       local mbGx = grnnArchUnits.bGx(nfArgs, fu, nGid, nNonTFs, teWeight)

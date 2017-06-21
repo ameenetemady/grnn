@@ -1,7 +1,6 @@
 require('../../requireBaseUnits.lua')
 
-local syngTwoAutoSimple = syngTwoAutoSimple or require('../../SyngTwoAutoSimple.lua')
-local syngOneAutoSimple = syngOneAutoSimple or require('../../SyngOneAutoSimple.lua')
+local mSyngOne = mSyngOne or require('../../SyngV7.lua')
 local grnnArchUnits = grnnArchUnits or require('../../grnnArchUnits.lua')
 
 local MCascade5Adapter, parent = MCascade5Adapter or torch.class("MCascade5Adapter", "AMNetAdapter")
@@ -24,10 +23,10 @@ end
 -- ***************************
 -- ****** Static Methods *****
 -- ***************************
-function MCascade5Adapter.pri_get_ConcatAbove(mUnit)
+function MCascade5Adapter.pri_get_ConcatRight(mUnit)
   local mRes = nn.Concat(2)
-  mRes:add(mUnit)
   mRes:add(nn.Identity())
+  mRes:add(mUnit)
   return mRes
 end
 
@@ -35,45 +34,43 @@ function MCascade5Adapter.getNewMNet(taWeights)
   taWeights = taWeights or {}
 
   local fuS1 = function(weight)
-    return syngOneAutoSimple.new(weight)
-  end
-
-  local fuS2 = function(weight)
-    return syngTwoAutoSimple.new(weight)
+    return mSyngOne.new(weight)
   end
 
   local fuInitS1 = function(teInputSlice, teTargetSclice, teKOSlice)
-    return syngOneAutoSimple.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
+    return mSyngOne.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
   end
 
-  local fuInitS2 = function(teInputSlice, teTargetSclice, teKOSlice)
-    return syngTwoAutoSimple.getInitWeights(teInputSlice, teTargetSclice, teKOSlice)
-  end
-
-
-  local nNonTFs = 2
+  local nNonTFs = 4
 
   local mSeqFinal = nn.Sequential()
 
-    local mG6 = grnnArchUnits.aGx(1, fuS1, 1, nNonTFs, 1, taWeights.G6) --(nfArgs, fu, nGid, nNonTFs, nTFid)
-    local mConH6 = MCascade5Adapter.pri_get_ConcatAbove(mG6)
-  mSeqFinal:add(mConH6) --d2: 6, 8
-    local mG7 = grnnArchUnits.aGx(2, fuS2, 2, nNonTFs, 1, taWeights.G7) --(nfArgs, fu, nGid, nNonTFs, nTFid)
-    local mConH7 = MCascade5Adapter.pri_get_ConcatAbove(mG7) --d2: 7,6,8
-  mSeqFinal:add(mConH7)
+    local mG2 = grnnArchUnits.aGx(1, fuS1, 1, nNonTFs, 1, taWeights.G2)
+--    local mConH2 = MCascade5Adapter.pri_get_ConcatRight(mG2)
+  mSeqFinal:add(mG2)
+
+    local mG3 = grnnArchUnits.aGx(1, fuS1, 2, nNonTFs, 1, taWeights.G3)
+    local mConH3 = MCascade5Adapter.pri_get_ConcatRight(mG3)
+  mSeqFinal:add(mConH3)
+
+    local mG4 = grnnArchUnits.aGx(1, fuS1, 3, nNonTFs, 2, taWeights.G4)
+    local mConH4 = MCascade5Adapter.pri_get_ConcatRight(mG4)
+  mSeqFinal:add(mConH4)
+
+  ----[[
+    local mG5 = grnnArchUnits.aGx(1, fuS1, 4, nNonTFs, 3, taWeights.G5)
+    local mConH5 = MCascade5Adapter.pri_get_ConcatRight(mG5)
+  mSeqFinal:add(mConH5)
+
 
   mSeqFinal:add(nn.Narrow(3, 1, 1))
   mSeqFinal:add(nn.Squeeze(3))
+  --]]
 
-  -- current order: 7, 6
-    local mReOrder = nn.Concat(2)
-      mReOrder:add(nn.Narrow(2, 2, 1))--6
-      mReOrder:add(nn.Narrow(2, 1, 1))--7
-  mSeqFinal:add(mReOrder)
-
-
-  local taFu = { G6 = { fu = fuS1, fuInit = fuInitS1, mGx = mG6, taIn={"G8"}},
-                 G7 = { fu = fuS2, fuInit = fuInitS2, mGx = mG7, taIn={"G6", "G8"}}
+  local taFu = { G2 = { fu = fuS1, fuInit = fuInitS1, mGx = mG2, taIn={"G1"}},
+                 G3 = { fu = fuS1, fuInit = fuInitS1, mGx = mG3, taIn={"G2"}},
+                 G4 = { fu = fuS1, fuInit = fuInitS1, mGx = mG4, taIn={"G3"}},
+                 G5 = { fu = fuS1, fuInit = fuInitS1, mGx = mG5, taIn={"G4"}}
                 }
 
   return mSeqFinal, taFu
